@@ -13,14 +13,26 @@ function vieworder(){
 function update(){
     include_once "connect/openConnect.php";
     $invoice = $_GET['id'];
-    $status = $_GET['ors'];
-    if ($status == 0 ){
-        $sql = "UPDATE invoice SET status = 1 WHERE id = '$invoice'";
-        mysqli_query($connect, $sql);
+    $invoiceId = (int)$invoice;
+    $result = mysqli_query($connect, "SELECT status FROM invoice WHERE id = $invoiceId LIMIT 1");
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $current = $row['status'];
+        $next = $current;
+        $setAdmin = '';
 
-    }
-    else {
-        $sql = "UPDATE invoice SET status = 0 WHERE id = '$invoice'";
+        if ($current === 'chua_duyet') {
+            $next = 'da_duyet';
+        } elseif ($current === 'da_duyet') {
+            $next = 'da_hoan_thanh';
+            if (isset($_SESSION['admin_id'])) {
+                $adminId = (int)$_SESSION['admin_id'];
+                $setAdmin = ", id_ad = $adminId";
+            }
+        }
+
+        $nextEscaped = mysqli_real_escape_string($connect, $next);
+        $sql = "UPDATE invoice SET status = '$nextEscaped' $setAdmin WHERE id = $invoiceId";
         mysqli_query($connect, $sql);
     }
     include_once "connect/closeConnect.php";

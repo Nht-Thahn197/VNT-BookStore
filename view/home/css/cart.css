@@ -247,3 +247,135 @@ input[type=number] {
 }
 
 
+
+
+/* cart-refresh */
+.cart {
+    padding: 2.4rem 0 4rem;
+}
+
+.cart__head {
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    border-radius: 0.8rem;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+    align-items: center;
+}
+
+.cart__body{
+    border: 1px solid #eef2f7;
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+    margin-top: 1.6rem;
+    align-items: center;
+}
+
+.cart__body-name {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.cart__body-name-img {
+    width: 8rem;
+    flex: 0 0 8rem;
+}
+
+.cart__body-name-img img{
+    width: 100%;
+    border-radius: 0.8rem;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+}
+
+.cart__body-name-title {
+    line-height: 1.4;
+}
+
+.cart__body-quantity {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+}
+
+.cart__body-quantity input[type="text"]{
+    width: 6.4rem;
+    height: 3.2rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.6rem;
+    text-align: center;
+    background: #f8fafc;
+}
+
+.cart__body-quantity-minus,
+.cart__body-quantity-plus {
+    width: 3.2rem;
+    height: 3.2rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.6rem;
+    background: #fff;
+    cursor: pointer;
+}
+
+.cart__body-price{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.cart__body-price a{
+    display: inline-flex;
+    min-width: 7rem;
+    height: 2.8rem;
+    background: #ef4444;
+    border-radius: 0.6rem;
+}
+
+.cart__foot{
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 1rem;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+    margin-top: 2rem;
+    align-items: center;
+}
+
+.cart__foot-update-row{
+    margin-top: 1.6rem;
+}
+
+.cart__foot-update-btn{
+    box-shadow: 0 6px 14px rgba(30, 58, 138, 0.2);
+}
+
+.cart__foot-price-btn{
+    background: var(--cta-color);
+    box-shadow: 0 6px 14px rgba(249, 115, 22, 0.25);
+}
+
+.cart__body-quantity-plus{
+    margin-left: 0;
+}
+
+
+/* cart-align */
+.cart__head-name,
+.cart__body-name {
+    text-align: left;
+}
+
+.cart__head-quantity,
+.cart__body-quantity {
+    text-align: center;
+}
+
+.cart__head-price,
+.cart__body-price {
+    text-align: right;
+}
+
+.cart__body-quantity {
+    justify-content: center;
+}

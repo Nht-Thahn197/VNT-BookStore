@@ -28,6 +28,17 @@ switch ($action){
         include_once  "models/productModels.php";
         include_once  "view/home/cart.php";
         break;
+    case 'payment':
+        include_once "models/productModels.php";
+        include_once "view/home/payment.php";
+        break;
+    case 'payment_process':
+        include_once "models/productModels.php";
+        header('location:index.php?controller=home&action=success');
+        break;
+    case 'success':
+        include_once "view/home/success.php";
+        break;
     case 'update_cart' :
         include_once "models/productModels.php";
         header('location:index.php?controller=home&action=cart');
@@ -43,4 +54,3 @@ switch ($action){
 }
 
 ?>
-

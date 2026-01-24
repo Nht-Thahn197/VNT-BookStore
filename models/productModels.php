@@ -1,4 +1,25 @@
 <?php
+include_once "models/cartModels.php";
+
+function table_columns($connect, $table) {
+    $columns = array();
+    $result = mysqli_query($connect, "SHOW COLUMNS FROM `$table`");
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $columns[] = $row['Field'];
+        }
+    }
+    return $columns;
+}
+
+function pick_column_name($columns, $candidates) {
+    foreach ($candidates as $candidate) {
+        if (in_array($candidate, $columns, true)) {
+            return $candidate;
+        }
+    }
+    return null;
+}
 function Product(){
     include_once "connect/openConnect.php";
     $search = '';
@@ -38,12 +59,9 @@ function create(){
     $sql = "SELECT * FROM categories";
     $categories = mysqli_query($connect,$sql);
 
-    $sql = "SELECT * FROM version";
-    $version = mysqli_query($connect,$sql);
     include_once "connect/closeConnect.php";
     $array = array();
     $array['categories'] = $categories;
-    $array['version'] = $version;
     return $array;
 }
 function store(){
@@ -71,14 +89,11 @@ function edit(){
     $sql = "SELECT * FROM categories";
     $categories = mysqli_query($connect,$sql);
 
-    $sql = "SELECT * FROM version";
-    $version = mysqli_query($connect,$sql);
     $sql = "SELECT * FROM book WHERE id = '$productid'";
     $book = mysqli_query($connect,$sql);
     include_once "connect/closeConnect.php";
     $array = array();
     $array['categories'] = $categories;
-    $array['version'] = $version;
     $array['book'] = $book;
     return $array;
 }
@@ -87,11 +102,18 @@ function update(){
     $name = $_POST['prd_name'];
     $status = $_POST['prd_status'];
     $price = $_POST['prd_price'];
-    $image = $_POST['prd_image'];
+    $price = str_replace(array('.', ','), array('', ''), $price);
+    $image = isset($_POST['prd_image_old']) ? $_POST['prd_image_old'] : '';
     $id_categories = $_POST['cat_id'];
     $amount = $_POST['prd_amount'];
     $content = $_POST['prd_content'];
     include_once "connect/openConnect.php";
+    if (isset($_FILES['prd_image']) && !empty($_FILES['prd_image']['name'])) {
+        $file_tmp = $_FILES['prd_image']['tmp_name'];
+        $newImage = $_FILES['prd_image']['name'];
+        move_uploaded_file($file_tmp, 'admin/images/'. $newImage);
+        $image = $newImage;
+    }
     $sql = "UPDATE book SET name = '$name', status = '$status', price ='$price', image = '$image', 
                 id_categories = '$id_categories',amount = '$amount', content = '$content'  
             WHERE id = $productid";
@@ -107,6 +129,10 @@ function remove(){
 }
 
 function add_to_cart() {
+    if (!isset($_SESSION['customer_id'])) {
+        header('Location:index.php?controller=customer&action=login');
+        exit;
+    }
     $product_id = $_GET['id'];
     if (isset($_SESSION['cart'])){
         if (isset($_SESSION['cart'][ $product_id ])){
@@ -119,10 +145,17 @@ function add_to_cart() {
         $_SESSION['cart'][ $product_id ] = 1;
 
     }
+    if (isset($_SESSION['customer_id'])) {
+        persist_cart_for_customer($_SESSION['customer_id'], $_SESSION['cart']);
+    }
 }
 function cart() {
     $cart = array();
     $temp = array();
+    if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart']) || empty($_SESSION['cart'])) {
+        $cart['product'] = array();
+        return $cart;
+    }
     include_once "connect/openConnect.php";
     $sub = 0;
     foreach ($_SESSION['cart'] as $product_id  => $amount){
@@ -147,48 +180,65 @@ function cart() {
 }
 
     function update_cart() {
-        $items =$_POST['amount'];
+        if (!isset($_POST['amount']) || !is_array($_POST['amount'])) {
+            return;
+        }
+        $items = $_POST['amount'];
         foreach ($items as $product_id => $amount){
             if ($amount < 1 ){
                 echo 'khong cho day';
             }else{$_SESSION['cart'][$product_id] = $amount;}
         }
+        if (isset($_SESSION['customer_id'])) {
+            persist_cart_for_customer($_SESSION['customer_id'], $_SESSION['cart']);
+        }
     }
     function delete_one_book() {
     $product_id = $_GET['id'];
-    unset($_SESSION['cart'][$product_id]);
+    if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
+        unset($_SESSION['cart'][$product_id]);
+    }
+    if (isset($_SESSION['customer_id'])) {
+        persist_cart_for_customer($_SESSION['customer_id'], $_SESSION['cart']);
+    }
     }
     function add_order(){
 
         $invoicedate = date("Y-m-d");
-        $invoicestatus = 0;
-        $customerid = $_SESSION['customer_id'];
+        $invoicestatus = 'chua_duyet';
+        $paymentMethod = isset($_POST['payment_method']) ? $_POST['payment_method'] : 'cash';
+        if (!isset($_SESSION['customer_id'])) {
+            header('Location:index.php?controller=customer&action=login');
+            exit;
+        }
+        $customerid = (int)$_SESSION['customer_id'];
         include_once "connect/openConnect.php";
-        $sqladmin = "SELECT id_admin FROM admin WHERE id_admin =1";
-        $admin = mysqli_query($connect,$sqladmin);
-        foreach ($admin as $ad){
-            $adminid = $ad['id_admin'];
 
-        }
-        $sql = "INSERT INTO invoice (status, date, id_ad, id_custumer) VALUES ('$invoicestatus', '$invoicedate','$adminid','$customerid')";
-        $invoice = mysqli_query($connect, $sql);
-        $sqlinvoice ="SELECT MAX(id) as id FROM invoice WHERE id_custumer = '$customerid'";
-        $invoices = mysqli_query($connect, $sqlinvoice);
-        foreach ($invoices as $inv){
-            $invoiceid = $inv['id'];
-        }
+        $paymentMethod = mysqli_real_escape_string($connect, $paymentMethod);
+        $statusEscaped = mysqli_real_escape_string($connect, $invoicestatus);
+
+        $sql = "INSERT INTO invoice (date_time, status, payment_method, id_custumer, id_ad)
+                VALUES ('$invoicedate', '$statusEscaped', '$paymentMethod', '$customerid', NULL)";
+        mysqli_query($connect, $sql);
+
+        $invoiceid = mysqli_insert_id($connect);
         foreach ($_SESSION['cart'] as $product_id => $amount){
             $sqlprice = "SELECT price FROM book WHERE id = '$product_id'";
             $bookprice = mysqli_query($connect, $sqlprice);
             foreach ($bookprice as $value){
                 $price = $value['price'];
             }
-            $sqlDetailInvoice = "INSERT INTO detailed_invoice VALUES ('$amount', '$price','$product_id', '$invoiceid')";
-            mysqli_query($connect, $sqlDetailInvoice);
+            if ($invoiceid) {
+                $sqlDetailInvoice = "INSERT INTO detailed_invoice VALUES ('$amount', '$price','$product_id', '$invoiceid')";
+                mysqli_query($connect, $sqlDetailInvoice);
+            }
         }
         include_once "connect/closeConnect.php";
         unset($_SESSION['cart'] );
         $_SESSION['cart'] = array();
+        if (isset($customerid)) {
+            clear_cart_for_customer($customerid);
+        }
     }
 switch ($action){
     case '';
@@ -221,6 +271,9 @@ switch ($action){
     case 'cart' :
         $cart = cart();
         break;
+    case 'payment' :
+        $cart = cart();
+        break;
     case 'update_cart' :
         update_cart();
         break;
@@ -228,6 +281,9 @@ switch ($action){
         delete_one_book();
         break;
     case 'add_order':
+        add_order();
+        break;
+    case 'payment_process':
         add_order();
         break;
 }

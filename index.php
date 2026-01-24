@@ -10,6 +10,7 @@
     switch ($controller){
         case 'admin'    :
             include_once "controllers/adminController.php";
+            break;
         case 'categories':
             include_once "controllers/categoriesController.php";
             break;
@@ -18,6 +19,9 @@
             break;
         case 'user':
             include_once "controllers/userController.php";
+            break;
+        case 'customer':
+            include_once "controllers/customerController.php";
             break;
         case 'order':
             include_once "controllers/orderController.php";

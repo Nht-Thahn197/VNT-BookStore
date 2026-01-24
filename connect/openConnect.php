@@ -1,3 +1,3 @@
 <?php
- $connect = mysqli_connect('localhost', 'root','', 'vnt_bookstore');
+ $connect = mysqli_connect('localhost', 'root','', 'bookstore');
 ?>

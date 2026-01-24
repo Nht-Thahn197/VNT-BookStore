@@ -31,7 +31,7 @@ CREATE TABLE `admin` (
   `id_admin` int(11) NOT NULL,
   `name_admin` varchar(50) NOT NULL,
   `email_admin` varchar(50) NOT NULL,
-  `password_ad` varchar(50) NOT NULL
+  `password_ad` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -106,7 +106,7 @@ CREATE TABLE `customer` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `password` varchar(11) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `address` varchar(100) NOT NULL,
   `phone` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -143,8 +143,9 @@ CREATE TABLE `detailed_invoice` (
 CREATE TABLE `invoice` (
   `id` int(11) NOT NULL,
   `date_time` date NOT NULL,
-  `status` varchar(50) NOT NULL,
-  `id_ad` int(11) NOT NULL,
+  `status` enum('chua_duyet','da_duyet','da_hoan_thanh') NOT NULL DEFAULT 'chua_duyet',
+  `payment_method` enum('cash','transfer') NOT NULL DEFAULT 'cash',
+  `id_ad` int(11) DEFAULT NULL,
   `id_custumer` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -250,6 +251,22 @@ ALTER TABLE `invoice`
   ADD CONSTRAINT `invoice_ibfk_1` FOREIGN KEY (`id_ad`) REFERENCES `admin` (`id_admin`),
   ADD CONSTRAINT `invoice_ibfk_2` FOREIGN KEY (`id_ad`) REFERENCES `admin` (`id_admin`),
   ADD CONSTRAINT `invoice_ibfk_3` FOREIGN KEY (`id_custumer`) REFERENCES `customer` (`id`);
+
+--
+-- Cau truc bang cho bang `customer_cart`
+--
+
+CREATE TABLE `customer_cart` (
+  `customer_id` int(11) NOT NULL,
+  `book_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  PRIMARY KEY (`customer_id`, `book_id`),
+  KEY `book_id` (`book_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+ALTER TABLE `customer_cart`
+  ADD CONSTRAINT `customer_cart_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `customer_cart_ibfk_2` FOREIGN KEY (`book_id`) REFERENCES `book` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

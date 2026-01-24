@@ -20,7 +20,10 @@
         });
 
         $(".product__panel-item").click(function(){
-            $(location).attr('href','product.php');
+            var link = $(this).find('.product__panel-link').attr('href');
+            if (link) {
+                window.location.href = link;
+            }
         });
 
         // $(".product__main-img-list img").click(function(){

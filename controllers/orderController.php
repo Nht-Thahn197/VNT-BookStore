@@ -4,6 +4,11 @@ if(isset($_GET['action'])){
     $action = $_GET['action'];
 }
 
+if (!isset($_SESSION['admin_id'])) {
+    header('Location:index.php?controller=admin&action=login');
+    exit;
+}
+
 switch ($action){
     case '':
         include_once "models/orderModels.php";

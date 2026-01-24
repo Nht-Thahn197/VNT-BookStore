@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nhà Sách 2T</title>
+<title>BookStore - Quản trị</title>
 
+<link rel="icon" type="image/png" href="view/admin/images/favicon_pos.ico">
 <link href="view/admin/css/bootstrap.min.css" rel="stylesheet">
 <link href="view/admin/css/datepicker3.css" rel="stylesheet">
 <link href="view/admin/css/bootstrap-table.css" rel="stylesheet">
@@ -18,14 +19,18 @@
 </head>
 
 <body>
+	<?php $error = isset($_GET['error']) ? $_GET['error'] : ''; ?>
 	
 	<div class="row">
 		<div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 col-md-4 col-md-offset-4">
 			<div class="login-panel panel panel-default">
-				<div class="panel-heading">Nhà Xuất Bản 2T - Administrator</div>
+				<div class="panel-heading">Nhà xuất bản VNT - Quản trị viên</div>
 				<div class="panel-body">
-					<form role="form" method="post">
+					<form role="form" method="post" action="index.php?controller=admin&action=loginProcess">
 						<fieldset>
+							<?php if ($error) { ?>
+								<div class="alert alert-danger">Sai tài khoản hoặc mật khẩu.</div>
+							<?php } ?>
 							<div class="form-group">
 								<input class="form-control" placeholder="E-mail" name="mail" type="email" autofocus>
 							</div>

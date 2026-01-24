@@ -3,6 +3,8 @@ Lumino Admin Bootstrap Template
 Version 1.0
 */
 
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap');
+
 
 /*Global Styles*/
 
@@ -570,7 +572,7 @@ a.bg-danger:hover {
 .sidebar ul.nav .active > a:focus, .sidebar ul.nav li.parent a.active:focus {
 	color: #fff;
 	background-color: #30a5ff;
-}*/
+}
 
 .sidebar ul.nav ul,
 .sidebar ul.nav ul li {
@@ -941,4 +943,392 @@ h1.page-header {
 
 thead {
 	font-weight: bold;
+}
+
+/* === Modern theme overrides === */
+:root {
+	--bg: #f6f2ea;
+	--bg-2: #eef4ff;
+	--surface: #ffffff;
+	--surface-2: #f5f7fb;
+	--text: #1f2937;
+	--muted: #6b7280;
+	--accent: #2f7cff;
+	--accent-2: #18a69b;
+	--warning: #f59e0b;
+	--danger: #ef4444;
+	--shadow-1: 0 12px 30px rgba(15, 23, 42, 0.12);
+	--shadow-2: 0 6px 16px rgba(15, 23, 42, 0.08);
+	--radius: 16px;
+	--radius-sm: 10px;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font-family: "Outfit", "Space Grotesk", "Segoe UI", Arial, sans-serif;
+	color: var(--text);
+	background: linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 45%, #f7f9fb 100%);
+	background-attachment: fixed;
+}
+
+a, a:hover, a:focus {
+	color: var(--accent);
+}
+
+p {
+	color: var(--muted);
+}
+
+h1, h2, h3, h4, h5, h6 {
+	color: var(--text);
+	letter-spacing: 0.2px;
+}
+
+h1 {
+	font-weight: 600;
+	font-size: 36px;
+}
+
+h2 {
+	font-weight: 600;
+}
+
+.page-header {
+	font-family: "Space Grotesk", "Outfit", "Segoe UI", Arial, sans-serif;
+	letter-spacing: 0.4px;
+}
+
+.navbar {
+	border: 0;
+	box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+}
+
+.navbar-inverse {
+	background: linear-gradient(120deg, #121829 0%, #1b2b4a 60%, #1a3558 100%);
+}
+
+.navbar-inverse .navbar-brand {
+	font-size: 18px;
+	letter-spacing: 3px;
+}
+
+.navbar-inverse .navbar-brand span {
+	color: #79e2ff;
+}
+
+.navbar-inverse .navbar-toggle {
+	border: 0;
+}
+
+.navbar-inverse .navbar-toggle:hover,
+.navbar-inverse .navbar-toggle:focus {
+	background: rgba(255, 255, 255, 0.12);
+}
+
+.user-menu {
+	margin-top: 10px;
+}
+
+.user-menu .dropdown-menu {
+	border: 0;
+	border-radius: var(--radius-sm);
+	box-shadow: var(--shadow-2);
+	padding: 8px;
+}
+
+.user-menu .dropdown-menu > li > a {
+	border-radius: 8px;
+	padding: 8px 12px;
+}
+
+.user-menu .dropdown-menu > li > a:hover {
+	background: #eef3ff;
+}
+
+.form-control {
+	border-radius: var(--radius-sm);
+	border: 1px solid #e5e7eb;
+	box-shadow: none;
+	height: 40px;
+}
+
+.form-control:focus {
+	border-color: var(--accent);
+	box-shadow: 0 0 0 3px rgba(47, 124, 255, 0.18);
+}
+
+.sidebar {
+	background: var(--surface);
+	border-right: 1px solid #e9edf4;
+	box-shadow: 8px 0 30px rgba(15, 23, 42, 0.08);
+}
+
+.sidebar form {
+	padding: 20px 18px 10px 18px;
+	border-bottom: 1px solid #eef1f6;
+}
+
+.sidebar ul.nav {
+	padding: 8px;
+}
+
+.sidebar ul.nav li a {
+	border-radius: 12px;
+	margin: 4px 0;
+	padding: 12px 14px;
+	color: #394150;
+	font-weight: 500;
+	transition: all 0.2s ease;
+}
+
+.sidebar ul.nav a:hover,
+.sidebar ul.nav li.parent ul li a:hover {
+	background: rgba(47, 124, 255, 0.08);
+	color: var(--accent);
+}
+
+.sidebar ul.nav .active > a,
+.sidebar ul.nav li.parent a.active,
+.sidebar ul.nav .active > a:hover,
+.sidebar ul.nav li.parent a.active:hover,
+.sidebar ul.nav .active > a:focus,
+.sidebar ul.nav li.parent a.active:focus {
+	background: linear-gradient(120deg, rgba(47, 124, 255, 0.2), rgba(24, 166, 155, 0.22));
+	color: #103056;
+	box-shadow: inset 0 0 0 1px rgba(47, 124, 255, 0.2);
+}
+
+.breadcrumb {
+	background: rgba(255, 255, 255, 0.7);
+	border-radius: var(--radius-sm);
+	box-shadow: var(--shadow-2);
+	margin: 10px;
+}
+
+.panel {
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-1);
+	overflow: hidden;
+	background: var(--surface);
+}
+
+.panel-heading {
+	font-weight: 600;
+	background: transparent;
+}
+
+.panel-default .panel-heading {
+	border-bottom: 1px solid #eef1f6;
+}
+
+.panel-widget {
+	background: var(--surface);
+}
+
+.panel-blue {
+	background: linear-gradient(135deg, #2f7cff, #4b9bff);
+	color: #fff;
+}
+
+.panel-teal {
+	background: linear-gradient(135deg, #12b69e, #46d3c4);
+	color: #fff;
+}
+
+.panel-orange {
+	background: linear-gradient(135deg, #f59e0b, #f8c47a);
+	color: #fff;
+}
+
+.panel-red {
+	background: linear-gradient(135deg, #ef4444, #f87171);
+	color: #fff;
+}
+
+.panel-widget .widget-left {
+	background: rgba(255, 255, 255, 0.16);
+	backdrop-filter: blur(6px);
+	border-radius: 0;
+}
+
+.panel-widget .widget-right {
+	background: rgba(255, 255, 255, 0.94);
+	color: var(--text);
+	height: 96px;
+	padding: 18px 20px;
+}
+
+.panel-widget .widget-right .large {
+	color: #0f172a;
+	font-weight: 600;
+	letter-spacing: 0.4px;
+}
+
+.panel-widget .widget-right .text-muted {
+	color: #6b7280;
+}
+
+.table {
+	overflow: hidden;
+}
+
+.fixed-table-container {
+	border-radius: var(--radius-sm);
+	overflow: hidden;
+	border: 1px solid #eef1f6;
+}
+
+.fixed-table-container thead th {
+	background: #f6f8fc;
+	color: #1f2937;
+	font-weight: 600;
+}
+
+.btn {
+	border-radius: 999px;
+	padding: 8px 16px;
+	font-weight: 600;
+	letter-spacing: 0.2px;
+}
+
+.btn-primary,
+.btn-primary:hover,
+.btn-primary:focus {
+	background: linear-gradient(135deg, #2f7cff, #4b9bff);
+	border-color: transparent;
+}
+
+.btn-success,
+.btn-success:hover,
+.btn-success:focus {
+	background: linear-gradient(135deg, #12b69e, #46d3c4);
+	border-color: transparent;
+	margin: 10px 0 !important;
+}
+
+.btn-warning,
+.btn-warning:hover,
+.btn-warning:focus {
+	background: linear-gradient(135deg, #f59e0b, #f8c47a);
+	border-color: transparent;
+	color: #1f2937;
+}
+
+.btn-danger,
+.btn-danger:hover,
+.btn-danger:focus {
+	background: linear-gradient(135deg, #ef4444, #f87171);
+	border-color: transparent;
+}
+
+@media (max-width: 768px) {
+	.sidebar {
+		box-shadow: none;
+	}
+
+	.panel-widget .widget-right {
+		height: auto;
+	}
+
+	.navbar-inverse .navbar-brand {
+		font-size: 16px;
+		letter-spacing: 2px;
+	}
+}
+
+/* Active menu highlight driven by controller */
+body[data-controller] .sidebar ul.nav li.active > a {
+	background: linear-gradient(120deg, rgba(47, 124, 255, 0.2), rgba(24, 166, 155, 0.22));
+	color: #103056;
+	box-shadow: inset 0 0 0 1px rgba(47, 124, 255, 0.2);
+}
+
+body[data-controller="admin"] .sidebar ul.nav a[href*="controller=admin"],
+body[data-controller="user"] .sidebar ul.nav a[href*="controller=user"],
+body[data-controller="categories"] .sidebar ul.nav a[href*="controller=categories"],
+body[data-controller="book"] .sidebar ul.nav a[href*="controller=book"],
+body[data-controller="order"] .sidebar ul.nav a[href*="controller=order"] {
+	background: linear-gradient(120deg, rgba(47, 124, 255, 0.2), rgba(24, 166, 155, 0.22)) !important;
+	color: #103056 !important;
+	box-shadow: inset 0 0 0 1px rgba(47, 124, 255, 0.2) !important;
+}
+
+/* Product form layout + clean inputs */
+body[data-controller="book"] .panel-body form {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 18px 24px;
+	align-items: flex-start;
+}
+
+body[data-controller="book"] .panel-body form > .col-md-6 {
+	float: none;
+	width: 100%;
+	padding: 0;
+	flex: 1 1 320px;
+}
+
+body[data-controller="book"] .panel-body form > .form-group,
+body[data-controller="book"] .panel-body form > button,
+body[data-controller="book"] .panel-body form > .btn {
+	flex: 0 0 100%;
+}
+
+body[data-controller="book"] .panel-body form .col-md-6 ~ .form-group,
+body[data-controller="book"] .panel-body form .col-md-6 ~ .btn,
+body[data-controller="book"] .panel-body form .col-md-6 ~ button {
+	clear: both;
+	width: 100%;
+	float: none;
+}
+
+body[data-controller="book"] .panel-body form .form-group {
+	margin-bottom: 16px;
+}
+
+body[data-controller="book"] .panel-body form label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 6px;
+}
+
+body[data-controller="book"] .panel-body form .input-group,
+body[data-controller="book"] .panel-body form .custom-file,
+body[data-controller="book"] .panel-body form .custom-file-input {
+	width: 100%;
+}
+
+body[data-controller="book"] .panel-body form .custom-file-label {
+	display: none;
+}
+
+body[data-controller="book"] .panel-body form label[for="inputGroupFile04"] {
+	display: none;
+}
+
+body[data-controller="book"] #prdImage {
+	display: block;
+	width: 100% !important;
+	max-width: 260px;
+	height: auto !important;
+	min-height: 200px;
+	border: 1px dashed #e5e7eb;
+	border-radius: 12px;
+	background: #f8fafc;
+	object-fit: cover;
+	margin-top: 10px;
+}
+
+/* Hide number spinners */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+input[type=number] {
+	-moz-appearance: textfield;
 }

@@ -1,6 +1,6 @@
 /*menu + slide*/
 .menu-slide{
-    background: #eff0f3;
+    background: linear-gradient(to right, #f8f9fa, #e9ecef);
 }
 
 .menu__nav{
@@ -23,20 +23,21 @@
 	margin-right: 1.5rem;
 }
 .menu__item:hover {
-    background: var(--primary-color);
-    
+    background: var(--secondary-color);
+    transform: translateX(5px);
+    transition: all 0.3s;
 }
 
 .menu__item:hover .menu__link{
     color: var(--white-color);
-    background: var(--primary-color);
+    background: var(--secondary-color);
     text-decoration: none;
     fill: var(--white-color);
 }
 
 .menu__item--active .menu__link{
-    color: var(--primary-color);
-    fill: var(--primary-color);
+    color: var(--secondary-color);
+    fill: var(--secondary-color);
 }
 .menu__link {
     font-size: 1.5rem;
@@ -133,7 +134,7 @@
 .bestselling__heading {
     font-size: 2.4rem;
     font-weight: 500;
-    color: var(--primary-color);
+    color: var(--secondary-color);
     position: relative;
 }
 
@@ -145,7 +146,7 @@
     display: block;
     width: 10rem;
     height: 0.4rem;
-    background: var(--primary-color);
+    background: var(--secondary-color);
     transform: translateX(-50%); 
 }
 
@@ -201,13 +202,13 @@
 
 .bestselling__product-rate {
     font-size: 1.4rem;
-    color: var(--primary-color);
+    color: var(--accent-color);
     margin-bottom: 0.8rem;
 }
 
 .bestselling__product-price {
     font-size: 1.8rem;
-    color: var(--primary-color);
+    color: var(--accent-color);
     font-weight: 500;
 }
 
@@ -219,7 +220,7 @@
     width: 10rem;
     height: 3rem;
     border-radius: 0.2rem;
-    background: var(--primary-color);
+    background: var(--cta-color);
     color: var(--white-color);
     display: flex;
     justify-content: center;
@@ -230,11 +231,12 @@
     font-weight: 500;
     margin: 1rem 0;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.3s;
 }
 
 .bestselling__product-btn:hover{
-    background: #ff2014;
+    transform: scale(1.05);
+    background: var(--cta-color-hover);
 }
 
 .bestselling__banner {
@@ -263,7 +265,7 @@
 /**/
 
 .product {
-    background: #efefef;
+    background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
     padding: 3rem 0;
 }
 
@@ -276,9 +278,10 @@
     align-items: center;
     width: 100%;
     height: 4.2rem;
-    background: var(--primary-color);
+    background: var(--gradient);
     border-top-left-radius: 4px;
     margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /*.product__sidebar-img {
@@ -348,7 +351,7 @@
     height: 4.2rem;
     list-style: none;
     background: var(--white-color);
-    border-top: 1px solid var(--primary-color);
+    border-top: 1px solid var(--secondary-color);
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -375,7 +378,7 @@
     display: block;
     width: 100%;
     height: 0.4rem;
-    background: var(--primary-color);
+    background: var(--secondary-color);
     top: -70%;
     left: 50%;
     transform: translateX(-50%);
@@ -389,7 +392,7 @@
     display: block;
     width: 100%;
     height: 0.4rem;
-    background: var(--primary-color);
+    background: var(--secondary-color);
     top: -70%;
     left: 50%;
     transform: translateX(-50%);
@@ -425,13 +428,21 @@
     background: var(--white-color);
     padding: 1rem 1.5rem;
     position: relative;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    transition: all 0.3s;
+}
+
+.product__panel-item-wrap:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
 }
 
 .product__panel-price-sale-off{
     width: 3.6rem;
     height: 3.6rem;
     border-radius: 50%;
-    background: var(--primary-color);
+    background: var(--accent-color);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -493,7 +504,7 @@
 
 .product__panel-rate {
     font-size: 1.4rem;
-    color: var(--primary-color);
+    color: var(--accent-color);
     margin: 1.2rem 0;
 }
 
@@ -511,9 +522,8 @@
 
 .product__panel-price-current {
     font-size: 1.6rem;
-    color: var(--primary-color);
+    color: var(--accent-color);
     font-weight: 500;
-
 }
 
 
@@ -529,7 +539,7 @@ section.product__love{
 
 .product__love-heading {
     font-size: 1.8rem;
-    color: var(--primary-color);
+    color: var(--secondary-color);
 }
 
 .product__panel-price-old-hide{
@@ -562,7 +572,7 @@ section.product__love{
 
 .posts__heading {
     padding: 3.2rem;
-    color: var(--primary-color);
+    color: var(--secondary-color);
     text-align: center;
     border-bottom: 1px solid #ccc;
     display: block;
@@ -576,7 +586,7 @@ section.product__love{
     left: 50%;
     width: 10rem;
     height: 0.3rem;
-    background: var(--primary-color);
+    background: var(--secondary-color);
     transform: translate(-50%,-90%);
 } 
 
@@ -661,18 +671,18 @@ section.product__love{
 
 .posts__view-btn {
     padding: 0.6rem 1.8rem;
-    background: var(--primary-color);
+    background: var(--gradient);
     color: var(--white-color);
     font-size: 1.3rem;
     border: none;
     outline: none;
     border-radius: 0.2rem;
+    transition: all 0.3s;
 }
 
 .posts__view-btn:hover{
     color: var(--white-color);
-    opacity: 0.8;
-    text-decoration: none;
+    transform: scale(1.05);
 }
 
 .fex{
@@ -687,7 +697,7 @@ section.product__love{
 }
 
 .product__title-mobile h2{
-    color: var(--primary-color);
+    color: var(--secondary-color);
     text-align: center;
     margin-bottom: 2rem;
     font-size: 2.4rem;
@@ -745,7 +755,6 @@ section.product__love{
     position: absolute;
     width: 100%;
     height: 100%;
-    background: red;
     background: rgba(0,0,0,0.6);
     z-index: 10000;
 }
@@ -780,7 +789,7 @@ section.product__love{
 
 .sale-off__sp{
     font-size: 3rem;
-    color: var(--primary-color);
+    color: var(--accent-color);
     font-weight: 700;
 }
 .sale-off__name{
@@ -799,16 +808,17 @@ section.product__love{
     padding: 0.6rem 2rem;
     outline: none;
     border: none;
-    box-shadow: inset 0 2rem 2.5rem 0.5rem var(--primary-color);
+    background: var(--cta-color);
     color: var(--white-color);
     font-size: 1.6rem;
     border-radius: 0.2rem;
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.3s;
 }
 
 .sale-off__btn:hover{
-    background: var(--primary-color);
+    transform: scale(1.05);
+    background: var(--cta-color-hover);
 }
 
 .sale-off__close{
@@ -830,5 +840,4 @@ section.product__love{
 .sale-off__close-icon{
     fill: #ccc;
 }
-
 
