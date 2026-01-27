@@ -19,7 +19,7 @@
  <link rel="stylesheet" href="view/home/css/category.css">
  <link rel="stylesheet" href="view/home/fonts/fontawesome/css/all.min.css">
 </head>
-<body>
+<body class="page-category">
     <!-- header -->
     <?php include_once 'view/home/partials/header.php'; ?>
     <!-- end header -->
@@ -39,26 +39,28 @@
             <?php } ?>
             <div class="row bg-white">
                 <?php foreach ($array['book'] as $boo) { ?>
-                <div class="product__panel-item col-lg-2 col-md-3 col-sm-6">
-                    <div class="product__panel-img-wrap">
-                        <img src="view/home/images1/product/<?= $boo['image']?>" alt="" class="product__panel-img">
-                    </div>
-                    <h3 class="product__panel-heading">
-                        <a href="index.php?controller=home&action=detail&id=<?=$boo['id']?>" class="product__panel-link"><?= $boo['name']?></a>
-                    </h3>
-                    <div class="product__panel-rate-wrap">
-                        <i class="fas fa-star product__panel-rate"></i>
-                        <i class="fas fa-star product__panel-rate"></i>
-                        <i class="fas fa-star product__panel-rate"></i>
-                        <i class="fas fa-star product__panel-rate"></i>
-                        <i class="fas fa-star product__panel-rate"></i>
-                    </div>
+                <div class="product__panel-item col-6 col-sm-6 col-md-4 col-lg-3">
+                    <div class="product__panel-item-card">
+                        <div class="product__panel-img-wrap">
+                            <img src="view/home/images1/product/<?= $boo['image']?>" alt="" class="product__panel-img">
+                        </div>
+                        <h3 class="product__panel-heading">
+                            <a href="index.php?controller=home&action=detail&id=<?=$boo['id']?>" class="product__panel-link"><?= $boo['name']?></a>
+                        </h3>
+                        <div class="product__panel-rate-wrap">
+                            <i class="fas fa-star product__panel-rate"></i>
+                            <i class="fas fa-star product__panel-rate"></i>
+                            <i class="fas fa-star product__panel-rate"></i>
+                            <i class="fas fa-star product__panel-rate"></i>
+                            <i class="fas fa-star product__panel-rate"></i>
+                        </div>
 
-                    <div class="product__panel-price">
-                        <span class="product__panel-price-current">
-                            <?=$boo['price']?>
-                        </span>
-                    </div>  
+                        <div class="product__panel-price">
+                            <span class="product__panel-price-current">
+                                <?= number_format($boo['price'], 0, ',', '.') ?> ₫
+                            </span>
+                        </div>  
+                    </div>
                 </div>
                  <?php } ?>
             </div>

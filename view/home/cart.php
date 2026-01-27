@@ -79,7 +79,7 @@
                     <input type="button" value="+" class="cart__body-quantity-plus">
                 </div>
                 <div class="col-3 cart__body-price">
-                    <span><?= $formattedNum = number_format($value['subtotal'], 0, ',', '.'); ?>đ</span>
+                    <span><?= $formattedNum = number_format($value['subtotal'], 0, ',', '.'); ?>₫</span>
 
                     <a href="index.php?controller=home&action=delete_one_book&id=<?= $product_id ?>">Xóa</a>
                 </div>

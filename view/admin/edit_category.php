@@ -22,6 +22,16 @@
 </head>
 
 <body data-controller="<?php echo isset($_GET['controller']) ? $_GET['controller'] : 'admin'; ?>">
+<?php
+$categoryRow = null;
+if (isset($categories)) {
+    if ($categories instanceof mysqli_result) {
+        $categoryRow = $categories->fetch_assoc();
+    } elseif (is_array($categories)) {
+        $categoryRow = isset($categories[0]) ? $categories[0] : $categories;
+    }
+}
+?>
 <?php include_once 'view/admin/partials/header.php'; ?>
 
 ">
@@ -30,13 +40,13 @@
 			<ol class="breadcrumb">
 				<li><a href="http://localhost/BookStore/index.php?controller=admin"><svg class="glyph stroked home"><use xlink:href="#stroked-home"></use></svg></a></li>
 				<li><a href="">Quản lý danh mục</a></li>
-				<li class="active">Danh mục 1</li>
+				<li class="active">Danh mục <?= !empty($categories) ? (int)$categories[0]['id'] : '' ?></li>
 			</ol>
 		</div><!--/.row-->
 		
 		<div class="row">
 			<div class="col-lg-12">
-				<h1 class="page-header">Sửa Danh mục:Danh mục 1</h1>
+				<h1 class="page-header">Sửa Danh mục: Danh mục <?= !empty($categories) ? (int)$categories[0]['id'] : '' ?></h1>
 			</div>
 		</div><!--/.row-->
         <div class="row">

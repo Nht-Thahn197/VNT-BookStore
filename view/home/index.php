@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang chủ - VNT-BookStore</title>
+    <title>Nhà xuất bản Việt Thành</title>
 
     <link rel="icon" type="image/png" href="view/home/images/favicon_home.ico">
     <script src="view/home/js/jquery-3.3.1.js"></script>
@@ -13,79 +13,61 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="view/home/fonts/fontawesome/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;800&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="view/home/css/style.css">
     <link rel="stylesheet" href="view/home/css/home.css">
 </head>
-<body>
+<body class="page-home">
     <div class="app">
         <?php include_once 'view/home/partials/header.php'; ?>
     <!--end header nav -->
 
-    <!-- slide - menu list -->
-    <section class="menu-slide">
+    <!-- hero -->
+    <section class="hero">
         <div class="container">
-            <div class="row">
-                <nav class="menu__nav col-lg-3 col-md-12 col-sm-0">
-                    <ul class="menu__list">
-                        <?php foreach ($array['categories'] as $cat) { ?>
-                            <li class="menu__item menu__item--active">
-                                <a href="index.php?controller=home&action=category&id=<?=$cat['id']?>" class="menu__link">
+            <div class="hero__grid">
+                <div class="hero__content">
+                    <span class="hero__eyebrow">VNT BookStore</span>
+                    <h1 class="hero__title">Đọc sách mới ngày, mở thêm thế giới mới</h1>
+                    <p class="hero__desc">
+                        Thư viện sách phong phú, cập nhật liên tục, danh mục rõ ràng để bạn chọn nhanh.
+                    </p>
+                    <div class="hero__actions">
+                        <a href="#home-products" class="hero__btn hero__btn--primary">Mua ngay</a>
+                        <a href="#home-products" class="hero__btn hero__btn--ghost">Xem sản phẩm</a>
+                    </div>
+                </div>
 
-                                   <?=$cat['name']?></a>
-                            </li>
-                        <?php }?>
-                      
-                    </ul>
-                </nav>
-
-                <div class="slider col-lg-9 col-md-12 col-sm-0">
-                    <div class="row">
-                        <div class="slide__left col-lg-8 col-md-0 col-sm-0">
-                            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" data-interval="3000">
-                                <!-- <ol class="carousel-indicators">
-                                    <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
-                                    <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
-                                    <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
-                                </ol> -->
-                                <div class="carousel-inner">
-                                    <div class="carousel-item active">
-                                        <img src="view/home/images1/banner/363488_final1511.jpg" class="d-block w-100" alt="...">
-                                    </div>
-                                    <div class="carousel-item">
-                                      <img src="view/home/images1/banner/Gold_DongA_600X350.jpg" class="d-block w-100" alt="...">
-                                    </div>
-                                    <div class="carousel-item">
-                                      <img src="view/home/images1/banner/megabook-glod600X350.png" class="d-block w-100" alt="...">
-                                    </div>
+                <div class="hero__media">
+                    <div class="hero__carousel">
+                        <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-ride="carousel" data-interval="3000">
+                            <div class="carousel-inner">
+                                <div class="carousel-item active">
+                                    <img src="view/home/images1/banner/363488_final1511.jpg" class="d-block w-100" alt="Slide 1">
                                 </div>
-                                <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                                <div class="carousel-item">
+                                    <img src="view/home/images1/banner/Gold_DongA_600X350.jpg" class="d-block w-100" alt="Slide 2">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="view/home/images1/banner/megabook-glod600X350.png" class="d-block w-100" alt="Slide 3">
+                                </div>
+                            </div>
+                            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
                                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                 <span class="sr-only">Previous</span>
-                                </a>
-                                <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                            </a>
+                            <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
                                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                 <span class="sr-only">Next</span>
-                                </a>
-                            </div>
-                            <div class="slide__left-bottom">
-                                <div class="slide__left-botom-one">
-                                    <img src="view/home/images1/banner/363107_05.jpg" class="slide__left-bottom-one-img">
-                                </div>
-                                <div class="slide__left-bottom-two">
-                                    <img src="view/home/images1/banner/363104_06.jpg" class="slide__left-bottom-tow-img">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="slide__right col-lg-4 col-md-0 col-sm-0">
-                            <img src="view/home/images1/banner/slider-right.png" class="slide__right-img">
+                            </a>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </section>
-    <!-- end slide menu list -->
+
 <!-- score-top-->
 
 <button onclick="topFunction()" id="myBtn-scroll" title="Go to top"><i class="fas fa-chevron-up"></i></i></button>
@@ -94,9 +76,16 @@
     <!-- end bestselling product -->
 
     <!-- product -->
-        <form action="">
-    <section class="product">
+    <section class="product" id="home-products">
         <div class="container" >
+            <div class="product__header">
+                <div class="product__header-text">
+                    <span class="section-label">Sản phẩm</span>
+                    <h2 class="section-title">Gợi ý dành cho bạn</h2>
+                    <p class="section-desc">Chọn nhanh những tựa sách nổi bật và dễ tìm.</p>
+                </div>
+                <a class="product__header-link" href="index.php?controller=home&action=product">Xem tất cả</a>
+            </div>
             <div class="row">
                 <aside class="product__sidebar col-lg-3 col-md-0 col-sm-12">
                     <div class="product__sidebar-heading">
@@ -137,7 +126,7 @@
                     </div>
                 </aside>
 
-                <article class="product__content col-lg-9 col-md-12 col-sm-12">
+                <article class="product__content col-lg-12 col-md-12 col-sm-12">
                     <nav class="row" >
                         <ul class="product__list hide-on-mobile" >
                             <li class="product__item product__item--active">
@@ -166,7 +155,7 @@
 
                                 <div class="product__panel-price">
                                     <span class="product__panel-price-current" >
-                                        <?= $formattedNum = number_format($boo['price'], 0, ',', '.');?>đ
+                                        <?= $formattedNum = number_format($boo['price'], 0, ',', '.');?>₫
                                     </span>
                                     <div class="product__panel-rate-wrap">
                                         <i class="fas fa-star product__panel-rate"></i>
@@ -176,6 +165,7 @@
                                         <i class="fas fa-star product__panel-rate"></i>
                                     </div>
                                 </div>
+                                <a href="index.php?controller=home&action=detail&id=<?=$boo['id'] ?>" class="product__panel-cta">Mua ngay</a>
                             </div>
                         </div>
                         <?php } ?>
@@ -185,7 +175,6 @@
             </div>
         </div>
     </section>
-        </form>
     <!--end product -->
 
     <!-- product love -->

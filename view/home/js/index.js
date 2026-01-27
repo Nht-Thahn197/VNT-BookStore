@@ -24,3 +24,37 @@ function topFunction() {
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  var menuWrap = document.querySelector(".header__nav-menu-wrap");
+  if (!menuWrap) return;
+
+  function setOpenState(isOpen) {
+    menuWrap.classList.toggle("is-open", isOpen);
+    menuWrap.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  }
+
+  menuWrap.addEventListener("click", function (event) {
+    if (event.target.closest(".header__nav-dropdown-item")) {
+      setOpenState(false);
+      return;
+    }
+    setOpenState(!menuWrap.classList.contains("is-open"));
+  });
+
+  menuWrap.addEventListener("keydown", function (event) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setOpenState(!menuWrap.classList.contains("is-open"));
+    }
+    if (event.key === "Escape") {
+      setOpenState(false);
+    }
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!menuWrap.contains(event.target)) {
+      setOpenState(false);
+    }
+  });
+});

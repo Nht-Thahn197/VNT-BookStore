@@ -35,7 +35,14 @@ function edit(){
     $productid = $_GET['id'];
     include_once "connect/openConnect.php";
     $sql = "SELECT * FROM categories WHERE id = '$productid'";
-    $categories = mysqli_query($connect,$sql);
+    $result = mysqli_query($connect,$sql);
+    $categories = array();
+    if ($result) {
+        $row = mysqli_fetch_assoc($result);
+        if ($row) {
+            $categories[] = $row;
+        }
+    }
     include_once "connect/closeConnect.php";
     return $categories;
 }

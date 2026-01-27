@@ -12,10 +12,11 @@
     <link rel="stylesheet" href="view/home/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="view/home/fonts/fontawesome/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;800&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="view/home/css/style.css">
     <link rel="stylesheet" href="view/home/css/product.css">
 </head>
-<body>
+<body class="page-product">
     <!-- header -->
     <?php include_once 'view/home/partials/header.php'; ?>
     <!--end header nav -->
@@ -72,7 +73,7 @@
 
                                 <div class="product__main-info-price">
                                     <span class="product__main-info-price-current">
-                                       <?=$formattedNum = number_format($boo['price'], 0, ',', '.');?>đ
+                                       <?=$formattedNum = number_format($boo['price'], 0, ',', '.');?>₫
                                     </span>
                                 </div>
 
@@ -119,9 +120,9 @@
                     </div>
                     <div class="row bg-white">
                         <div class="col-12 product__main-tab">
-                            <a href="#" class="product__main-tab-link product__main-tab-link--active">
+                            <span class="product__main-tab-link product__main-tab-link--active">
                                 Mô tả
-                            </a>
+                            </span>
                         </div>
 
 

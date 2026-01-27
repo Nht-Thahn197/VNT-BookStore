@@ -23,6 +23,45 @@
 
 <body data-controller="<?php echo isset($_GET['controller']) ? $_GET['controller'] : 'admin'; ?>">
 <?php include_once 'view/admin/partials/header.php'; ?>
+<?php
+function admin_normalize_rows($data) {
+    if ($data instanceof mysqli_result) {
+        $rows = array();
+        while ($row = $data->fetch_assoc()) {
+            $rows[] = $row;
+        }
+        return $rows;
+    }
+    if (is_array($data)) {
+        return $data;
+    }
+    return array();
+}
+
+$userRows = admin_normalize_rows(isset($users) ? $users : array());
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$perPage = 10;
+$totalItems = count($userRows);
+$totalPages = (int)ceil($totalItems / $perPage);
+if ($totalPages < 1) {
+    $totalPages = 1;
+}
+if ($page > $totalPages) {
+    $page = $totalPages;
+}
+$offset = ($page - 1) * $perPage;
+$pagedUsers = array_slice($userRows, $offset, $perPage);
+
+$paginationController = isset($_GET['controller']) ? $_GET['controller'] : 'user';
+function admin_page_url($pageNum, $controllerDefault) {
+    $params = $_GET;
+    if (!isset($params['controller'])) {
+        $params['controller'] = $controllerDefault;
+    }
+    $params['page'] = $pageNum;
+    return 'index.php?' . http_build_query($params);
+}
+?>
 
 ">
 	<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
@@ -58,7 +97,7 @@
 							</tr>
 							</thead>
 							<tbody>
-							<?php foreach ($users as $user) { ?>
+							<?php foreach ($pagedUsers as $user) { ?>
 								<tr>
 									<td><?= $user['id'] ?></td>
 									<td><?= $user['name'] ?></td>
@@ -73,17 +112,25 @@
 							</tbody>
 						</table>
 					</div>
-					<div class="panel-footer">
-						<nav aria-label="Page navigation example">
-							<ul class="pagination">
-								<li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
-								<li class="page-item"><a class="page-link" href="#">1</a></li>
-								<li class="page-item"><a class="page-link" href="#">2</a></li>
-								<li class="page-item"><a class="page-link" href="#">3</a></li>
-								<li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
-							</ul>
-						</nav>
-					</div>
+					<?php if ($totalPages > 1) { ?>
+						<div class="panel-footer">
+							<nav aria-label="Page navigation example">
+								<ul class="pagination">
+									<li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
+										<a class="page-link" href="<?= $page <= 1 ? '#' : admin_page_url($page - 1, $paginationController) ?>">&laquo;</a>
+									</li>
+									<?php for ($i = 1; $i <= $totalPages; $i++) { ?>
+										<li class="page-item <?= $i === $page ? 'active' : '' ?>">
+											<a class="page-link" href="<?= admin_page_url($i, $paginationController) ?>"><?= $i ?></a>
+										</li>
+									<?php } ?>
+									<li class="page-item <?= $page >= $totalPages ? 'disabled' : '' ?>">
+										<a class="page-link" href="<?= $page >= $totalPages ? '#' : admin_page_url($page + 1, $paginationController) ?>">&raquo;</a>
+									</li>
+								</ul>
+							</nav>
+						</div>
+					<?php } ?>
 				</div>
 			</div>
 		</div>

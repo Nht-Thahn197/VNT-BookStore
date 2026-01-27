@@ -86,12 +86,6 @@ if (isset($connect) && $connect) {
                 </div>
                 <div class="col-lg-6 col-md-7 col-sm-0 header__search">
                     <form method="post" action="index.php?controller=home" class="header__search-form">
-                        <select name="category" class="header__search-select">
-                            <option value="">Tất cả</option>
-                            <?php foreach ($headerCategories as $cat) { ?>
-                                <option value="<?=$cat['id']?>"><?=$cat['name']?></option>
-                            <?php }?>
-                        </select>
                         <input type="text" class="header__search-input" name="search" value="<?= $headerSearch ?>" placeholder="Tìm kiếm tại đây...">
                         <button type="submit" class="header__search-btn">
                             <div class="header__search-icon-wrap">
@@ -130,9 +124,16 @@ if (isset($connect) && $connect) {
     <div class="header__nav">
         <div class="container">
             <section class="row">
-                <div class="header__nav-menu-wrap col-lg-3 col-md-0 col-sm-0">
+                <div class="header__nav-menu-wrap col-lg-3 col-md-0 col-sm-0" role="button" tabindex="0" aria-expanded="false">
                     <i class="fas fa-bars header__nav-menu-icon"></i>
                     <div class="header__nav-menu-title">Danh mục sản phẩm</div>
+                    <div class="header__nav-dropdown">
+                        <div class="header__nav-dropdown-inner">
+                            <?php foreach ($headerCategories as $cat) { ?>
+                                <a href="index.php?controller=home&action=category&id=<?=$cat['id']?>" class="header__nav-dropdown-item"><?=$cat['name']?></a>
+                            <?php }?>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="header__nav col-lg-9 col-md-0 col-sm-0">
