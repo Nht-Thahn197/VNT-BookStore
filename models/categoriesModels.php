@@ -13,7 +13,7 @@ function category() {
     include_once "connect/openConnect.php";
     $sqlCategory = "SELECT * FROM categories WHERE id = '$categoryid'";
     $category = mysqli_query($connect,$sqlCategory);
-    $sql = "SELECT * FROM book WHERE id_categories = '$categoryid'";
+    $sql = "SELECT * FROM book WHERE category_id = '$categoryid'";
     $book = mysqli_query($connect,$sql);
     include_once "connect/closeConnect.php";
     $array = array();

@@ -67,7 +67,7 @@
             <article class="row cart__body">
                 <div class="col-6 cart__body-name">
                     <div class="cart__body-name-img">
-                        <img src="view/home/images1/product/<?= $value['image'] ?>">
+                        <img src="<?= htmlspecialchars(home_product_image_path($value['image']), ENT_QUOTES) ?>">
                     </div>
                     <a href="" class="cart__body-name-title">
                         <?= $value['name'] ?>

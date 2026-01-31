@@ -41,7 +41,10 @@ function Product(){
 function detail() {
     $productid = $_GET['id'];
     include_once "connect/openConnect.php";
-    $sqlBook = "SELECT * FROM book WHERE id = '$productid'";
+    $sqlBook = "SELECT book.*, author.name AS author_name
+                FROM book
+                LEFT JOIN author ON book.author_id = author.id
+                WHERE book.id = '$productid'";
     $book = mysqli_query($connect,$sqlBook);
     include_once "connect/closeConnect.php";
     return $book;
@@ -58,26 +61,41 @@ function create(){
     include_once "connect/openConnect.php";
     $sql = "SELECT * FROM categories";
     $categories = mysqli_query($connect,$sql);
+    $authorResult = mysqli_query($connect, "SELECT * FROM author");
 
     include_once "connect/closeConnect.php";
     $array = array();
     $array['categories'] = $categories;
+    $array['authors'] = $authorResult;
     return $array;
 }
 function store(){
     $name = $_POST['prd_name'];
-    $status = $_POST['prd_status'];
+    $authorId = isset($_POST['author_id']) ? (int)$_POST['author_id'] : 0;
+    $size = isset($_POST['prd_size']) ? $_POST['prd_size'] : '';
+    $bookcover = isset($_POST['prd_bookcover']) ? $_POST['prd_bookcover'] : '';
+    $numberPagesRaw = isset($_POST['prd_number_pages']) ? $_POST['prd_number_pages'] : '';
+    $numberPages = (int)preg_replace('/\D/', '', (string)$numberPagesRaw);
+    $statusInput = isset($_POST['prd_status']) ? $_POST['prd_status'] : '';
     $price = $_POST['prd_price'];
-    $image = $_FILES['image']['name'];;
-    $id_categories = $_POST['cat_id'];
-    $amount = $_POST['prd_amount'];
+    $image = isset($_FILES['prd_image']['name']) ? basename($_FILES['prd_image']['name']) : '';
+    $category_id = $_POST['cat_id'];
+    $amountValue = 0;
     $content = $_POST['prd_content'];
+    if ($amountValue <= 0) {
+        $status = 'out_of_stock';
+    } else {
+        $status = ($statusInput === 'inactive') ? 'inactive' : 'active';
+    }
     include_once "connect/openConnect.php";
-    $file_tmp = $_FILES['prd_image']['tmp_name'];;
-    move_uploaded_file($file_tmp, 'admin/images/'. $image);
+    if ($image !== '' && isset($_FILES['prd_image']['tmp_name'])) {
+        $file_tmp = $_FILES['prd_image']['tmp_name'];
+        move_uploaded_file($file_tmp, 'view/admin/images/'. $image);
+    }
 
-    $sql = "INSERT INTO book (name,status,price,image,id_categories,amount,content) 
-        VALUES('$name','$status','$price','$image','$id_categories','$amount','$content')";
+    $authorIdValue = $authorId > 0 ? $authorId : 'NULL';
+    $sql = "INSERT INTO book (name,author_id,size,bookcover,number_pages,status,price,image,category_id,amount,content) 
+        VALUES('$name',$authorIdValue,'$size','$bookcover','$numberPages','$status','$price','$image','$category_id','$amountValue','$content')";
     mysqli_query($connect,$sql);
 
     include_once "connect/closeConnect.php";
@@ -91,31 +109,52 @@ function edit(){
 
     $sql = "SELECT * FROM book WHERE id = '$productid'";
     $book = mysqli_query($connect,$sql);
+    $authorResult = mysqli_query($connect, "SELECT * FROM author");
     include_once "connect/closeConnect.php";
     $array = array();
     $array['categories'] = $categories;
     $array['book'] = $book;
+    $array['authors'] = $authorResult;
     return $array;
 }
 function update(){
     $productid = $_POST['prd_id'];
     $name = $_POST['prd_name'];
-    $status = $_POST['prd_status'];
+    $authorId = isset($_POST['author_id']) ? (int)$_POST['author_id'] : 0;
+    $size = isset($_POST['prd_size']) ? $_POST['prd_size'] : '';
+    $bookcover = isset($_POST['prd_bookcover']) ? $_POST['prd_bookcover'] : '';
+    $numberPagesRaw = isset($_POST['prd_number_pages']) ? $_POST['prd_number_pages'] : '';
+    $numberPages = (int)preg_replace('/\D/', '', (string)$numberPagesRaw);
+    $statusInput = isset($_POST['prd_status']) ? $_POST['prd_status'] : '';
     $price = $_POST['prd_price'];
     $price = str_replace(array('.', ','), array('', ''), $price);
     $image = isset($_POST['prd_image_old']) ? $_POST['prd_image_old'] : '';
-    $id_categories = $_POST['cat_id'];
-    $amount = $_POST['prd_amount'];
+    $category_id = $_POST['cat_id'];
     $content = $_POST['prd_content'];
     include_once "connect/openConnect.php";
+    $amountValue = 0;
+    $amountResult = mysqli_query($connect, "SELECT amount FROM book WHERE id = $productid LIMIT 1");
+    if ($amountResult && mysqli_num_rows($amountResult) > 0) {
+        $amountRow = mysqli_fetch_assoc($amountResult);
+        if (isset($amountRow['amount'])) {
+            $amountValue = (int)$amountRow['amount'];
+        }
+    }
+    if ($amountValue <= 0) {
+        $status = 'out_of_stock';
+    } else {
+        $status = ($statusInput === 'inactive') ? 'inactive' : 'active';
+    }
     if (isset($_FILES['prd_image']) && !empty($_FILES['prd_image']['name'])) {
         $file_tmp = $_FILES['prd_image']['tmp_name'];
-        $newImage = $_FILES['prd_image']['name'];
-        move_uploaded_file($file_tmp, 'admin/images/'. $newImage);
+        $newImage = basename($_FILES['prd_image']['name']);
+        move_uploaded_file($file_tmp, 'view/admin/images/'. $newImage);
         $image = $newImage;
     }
-    $sql = "UPDATE book SET name = '$name', status = '$status', price ='$price', image = '$image', 
-                id_categories = '$id_categories',amount = '$amount', content = '$content'  
+    $authorIdValue = $authorId > 0 ? $authorId : 'NULL';
+    $sql = "UPDATE book SET name = '$name', author_id = $authorIdValue, size = '$size', bookcover = '$bookcover', number_pages = '$numberPages',
+                status = '$status', price ='$price', image = '$image', 
+                category_id = '$category_id',amount = '$amountValue', content = '$content'  
             WHERE id = $productid";
     mysqli_query($connect, $sql);
     include_once "connect/closeConnect.php";
@@ -204,8 +243,8 @@ function cart() {
     }
     function add_order(){
 
-        $invoicedate = date("Y-m-d");
-        $invoicestatus = 'chua_duyet';
+        $invoiceDateTime = date("Y-m-d H:i:s");
+        $invoicestatus = 'pending';
         $paymentMethod = isset($_POST['payment_method']) ? $_POST['payment_method'] : 'cash';
         if (!isset($_SESSION['customer_id'])) {
             header('Location:index.php?controller=customer&action=login');
@@ -216,20 +255,43 @@ function cart() {
 
         $paymentMethod = mysqli_real_escape_string($connect, $paymentMethod);
         $statusEscaped = mysqli_real_escape_string($connect, $invoicestatus);
+        $userIdValue = 'NULL';
+        if (isset($_SESSION['admin_id'])) {
+            $userIdValue = (int)$_SESSION['admin_id'];
+        }
 
-        $sql = "INSERT INTO invoice (date_time, status, payment_method, id_custumer, id_ad)
-                VALUES ('$invoicedate', '$statusEscaped', '$paymentMethod', '$customerid', NULL)";
-        mysqli_query($connect, $sql);
-
-        $invoiceid = mysqli_insert_id($connect);
+        $items = array();
+        $totalAmount = 0;
         foreach ($_SESSION['cart'] as $product_id => $amount){
             $sqlprice = "SELECT price FROM book WHERE id = '$product_id'";
             $bookprice = mysqli_query($connect, $sqlprice);
             foreach ($bookprice as $value){
-                $price = $value['price'];
+                $priceValue = $value['price'];
+                $priceValue = str_replace(array(',', ' '), array('', ''), $priceValue);
+                $price = (float)$priceValue;
+                $lineTotal = $price * (int)$amount;
+                $totalAmount += $lineTotal;
+                $items[] = array(
+                    'product_id' => $product_id,
+                    'amount' => $amount,
+                    'price' => $price,
+                );
             }
+        }
+        $totalAmountFormatted = number_format($totalAmount, 2, '.', '');
+
+        $sql = "INSERT INTO invoice (customer_id, user_id, date_time, status, payment_method, total_amount)
+                VALUES ('$customerid', $userIdValue, '$invoiceDateTime', '$statusEscaped', '$paymentMethod', '$totalAmountFormatted')";
+        mysqli_query($connect, $sql);
+
+        $invoiceid = mysqli_insert_id($connect);
+        foreach ($items as $item){
             if ($invoiceid) {
-                $sqlDetailInvoice = "INSERT INTO detailed_invoice VALUES ('$amount', '$price','$product_id', '$invoiceid')";
+                $amount = (int)$item['amount'];
+                $price = number_format($item['price'], 2, '.', '');
+                $product_id = $item['product_id'];
+                $sqlDetailInvoice = "INSERT INTO detailed_invoice (invoice_id, book_id, quantity, unit_price)
+                                    VALUES ('$invoiceid', '$product_id', '$amount', '$price')";
                 mysqli_query($connect, $sqlDetailInvoice);
             }
         }

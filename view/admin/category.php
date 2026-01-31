@@ -38,10 +38,30 @@ function admin_normalize_rows($data) {
     return array();
 }
 
+function admin_lower_text($value) {
+    if (function_exists('mb_strtolower')) {
+        return mb_strtolower($value, 'UTF-8');
+    }
+    return strtolower($value);
+}
+
 $categoryRows = admin_normalize_rows(isset($categories) ? $categories : array());
+$filterTerm = isset($_GET['filter_term']) ? trim((string)$_GET['filter_term']) : '';
+
+$filteredCategories = $categoryRows;
+if ($filterTerm !== '') {
+    $filteredCategories = array_values(array_filter($categoryRows, function ($row) use ($filterTerm) {
+        $rowId = isset($row['id']) ? (string)$row['id'] : '';
+        $rowName = isset($row['name']) ? (string)$row['name'] : '';
+        $termLower = admin_lower_text($filterTerm);
+        return (strpos($rowId, $filterTerm) !== false)
+            || (strpos(admin_lower_text($rowName), $termLower) !== false);
+    }));
+}
+
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $perPage = 10;
-$totalItems = count($categoryRows);
+$totalItems = count($filteredCategories);
 $totalPages = (int)ceil($totalItems / $perPage);
 if ($totalPages < 1) {
     $totalPages = 1;
@@ -50,7 +70,7 @@ if ($page > $totalPages) {
     $page = $totalPages;
 }
 $offset = ($page - 1) * $perPage;
-$pagedCategories = array_slice($categoryRows, $offset, $perPage);
+$pagedCategories = array_slice($filteredCategories, $offset, $perPage);
 
 $paginationController = isset($_GET['controller']) ? $_GET['controller'] : 'categories';
 function admin_page_url($pageNum, $controllerDefault) {
@@ -62,8 +82,6 @@ function admin_page_url($pageNum, $controllerDefault) {
     return 'index.php?' . http_build_query($params);
 }
 ?>
-
-">
 		<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">			
 		<div class="row">
 			<ol class="breadcrumb">
@@ -82,6 +100,19 @@ function admin_page_url($pageNum, $controllerDefault) {
                 <i class="glyphicon glyphicon-plus"></i> Thêm danh mục
             </a>
         </div>
+		<div class="row">
+			<div class="col-lg-12">
+				<form class="form-inline" method="get" action="index.php" style="margin: 12px 0 20px;">
+					<input type="hidden" name="controller" value="categories">
+					<div class="form-group">
+						<label class="sr-only" for="filter-term">Mã hoặc tên danh mục</label>
+						<input id="filter-term" type="text" name="filter_term" class="form-control" placeholder="Mã hoặc tên danh mục" value="<?= htmlspecialchars($filterTerm, ENT_QUOTES) ?>">
+					</div>
+					<button type="submit" class="btn btn-primary" style="margin-left: 8px;">Lọc</button>
+					<a class="btn btn-default" href="index.php?controller=categories" style="margin-left: 6px;">Xóa lọc</a>
+				</form>
+			</div>
+		</div>
 		<div class="row">
 			<div class="col-md-12">
 					<div class="panel panel-default">

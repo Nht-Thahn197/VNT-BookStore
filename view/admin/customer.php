@@ -38,10 +38,33 @@ function admin_normalize_rows($data) {
     return array();
 }
 
+function admin_lower_text($value) {
+    if (function_exists('mb_strtolower')) {
+        return mb_strtolower($value, 'UTF-8');
+    }
+    return strtolower($value);
+}
+
 $customerRows = admin_normalize_rows(isset($customer) ? $customer : array());
+$filterTerm = isset($_GET['filter_term']) ? trim((string)$_GET['filter_term']) : '';
+
+$filteredCustomers = $customerRows;
+if ($filterTerm !== '') {
+    $termLower = admin_lower_text($filterTerm);
+    $filteredCustomers = array_values(array_filter($customerRows, function ($row) use ($filterTerm, $termLower) {
+        $rowId = isset($row['id']) ? (string)$row['id'] : '';
+        $rowName = isset($row['name']) ? (string)$row['name'] : '';
+        $rowPhone = isset($row['phone']) ? (string)$row['phone'] : '';
+
+        return (strpos($rowId, $filterTerm) !== false)
+            || (strpos(admin_lower_text($rowName), $termLower) !== false)
+            || (strpos($rowPhone, $filterTerm) !== false);
+    }));
+}
+
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $perPage = 10;
-$totalItems = count($customerRows);
+$totalItems = count($filteredCustomers);
 $totalPages = (int)ceil($totalItems / $perPage);
 if ($totalPages < 1) {
     $totalPages = 1;
@@ -50,7 +73,7 @@ if ($page > $totalPages) {
     $page = $totalPages;
 }
 $offset = ($page - 1) * $perPage;
-$pagedCustomers = array_slice($customerRows, $offset, $perPage);
+$pagedCustomers = array_slice($filteredCustomers, $offset, $perPage);
 
 $paginationController = isset($_GET['controller']) ? $_GET['controller'] : 'customer';
 function admin_page_url($pageNum, $controllerDefault) {
@@ -62,8 +85,6 @@ function admin_page_url($pageNum, $controllerDefault) {
     return 'index.php?' . http_build_query($params);
 }
 ?>
-
-">
         <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">			
 		<div class="row">
 			<ol class="breadcrumb">
@@ -84,6 +105,15 @@ function admin_page_url($pageNum, $controllerDefault) {
         </div>
 		<div class="row">
 			<div class="col-lg-12">
+				<form class="form-inline" method="get" action="index.php" style="margin: 12px 0 20px;">
+					<input type="hidden" name="controller" value="customer">
+					<div class="form-group">
+						<label class="sr-only" for="filter-term">Theo mã, tên hoặc số điện thoại</label>
+						<input id="filter-term" type="text" name="filter_term" class="form-control" placeholder="Theo mã, tên hoặc số điện thoại" value="<?= htmlspecialchars($filterTerm, ENT_QUOTES) ?>">
+					</div>
+					<button type="submit" class="btn btn-primary" style="margin-left: 8px;">Lọc</button>
+					<a class="btn btn-default" href="index.php?controller=customer" style="margin-left: 6px;">Xóa lọc</a>
+				</form>
 				<div class="panel panel-default">
 					<div class="panel-body">
                         <table 

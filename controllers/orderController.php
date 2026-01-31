@@ -16,7 +16,7 @@ switch ($action){
         break;
     case 'edit':
         include_once "models/orderModels.php";
-        header('location: index.php?controller=order');
+        header('location: index.php?controller=order&toast=order_updated');
         break;
     case 'detail':
         include_once "models/orderModels.php";

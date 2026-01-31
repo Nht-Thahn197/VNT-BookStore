@@ -14,6 +14,12 @@
         case 'categories':
             include_once "controllers/categoriesController.php";
             break;
+        case 'import':
+            include_once "controllers/importController.php";
+            break;
+        case 'author':
+            include_once "controllers/authorController.php";
+            break;
         case 'book':
             include_once "controllers/productController.php";
             break;

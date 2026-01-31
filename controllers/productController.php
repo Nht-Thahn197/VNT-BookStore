@@ -21,7 +21,7 @@ switch ($action){
         break;
     case 'store':
         include_once "models/productModels.php";
-        header('Location:index.php?controller=book');
+        header('Location:index.php?controller=book&toast=created');
         break;
     case 'edit':
         include_once "models/productModels.php";
@@ -29,11 +29,11 @@ switch ($action){
         break;
     case 'update':
         include_once "models/productModels.php";
-        header('Location:index.php?controller=book');
+        header('Location:index.php?controller=book&toast=updated');
         break;
     case 'remove':
         include_once "models/productModels.php";
-        header('Location:index.php?controller=book');
+        header('Location:index.php?controller=book&toast=deleted');
         break;
     case 'detail':
         include_once "models/productModels.php";

@@ -36,6 +36,20 @@ if (isset($connect) && $connect) {
 
     include __DIR__ . "/../../../connect/closeConnect.php";
 }
+
+if (!function_exists('home_product_image_path')) {
+    function home_product_image_path($filename) {
+        $filename = trim((string)$filename);
+        if ($filename === '') {
+            return '';
+        }
+        $adminPath = __DIR__ . '/../../admin/images/' . $filename;
+        if (is_file($adminPath)) {
+            return 'view/admin/images/' . $filename;
+        }
+        return 'view/home/images1/product/' . $filename;
+    }
+}
 ?>
 <header id="header">
     <!-- header top -->
@@ -61,7 +75,7 @@ if (isset($connect) && $connect) {
                                     Hi <?= $customerName ? $customerName : 'Bạn' ?>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="#" class="dropdown-item">Tài khoản</a></li>
+                                    <li><a href="index.php?controller=customer&action=account" class="dropdown-item">Tài khoản</a></li>
                                     <li><a href="index.php?controller=customer&action=logout" class="dropdown-item">Đăng xuất</a></li>
                                 </ul>
                             </li>

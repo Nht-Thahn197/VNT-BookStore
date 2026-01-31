@@ -23,8 +23,6 @@
 
 <body data-controller="<?php echo isset($_GET['controller']) ? $_GET['controller'] : 'admin'; ?>">
 <?php include_once 'view/admin/partials/header.php'; ?>
-
-">
 	<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
 		<div class="row">
 			<ol class="breadcrumb">
@@ -52,6 +50,19 @@
 								<div class="form-group">
 									<label>Email</label>
 									<input name="user_email" required class="form-control" type="email">
+								</div>
+								<div class="form-group">
+									<label>So dien thoai</label>
+									<input name="user_phone" class="form-control" type="text">
+								</div>
+								<div class="form-group">
+									<label>Gioi tinh</label>
+									<select name="user_gender" class="form-control">
+										<option value="">Khong xac dinh</option>
+										<option value="male">Nam</option>
+										<option value="female">Nu</option>
+										<option value="other">Khac</option>
+									</select>
 								</div>
 								<div class="form-group">
 									<label>Mật khẩu</label>

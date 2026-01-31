@@ -18,22 +18,22 @@
          case 'create':
              include_once "view/admin/add_category.php";
              break;
-         case 'store':
-             include_once "models/categoriesModels.php";
-             header('Location:index.php?controller=categories');
-             break;
+        case 'store':
+            include_once "models/categoriesModels.php";
+            header('Location:index.php?controller=categories&toast=created');
+            break;
          case 'edit':
              include_once "models/categoriesModels.php";
              include_once "view/admin/edit_category.php";
              break;
-         case 'update':
-             include_once "models/categoriesModels.php";
-             header('Location:index.php?controller=categories');
-             break;
-         case 'remove':
-             include_once "models/categoriesModels.php";
-             header('Location:index.php?controller=categories');
-             break;
+        case 'update':
+            include_once "models/categoriesModels.php";
+            header('Location:index.php?controller=categories&toast=updated');
+            break;
+        case 'remove':
+            include_once "models/categoriesModels.php";
+            header('Location:index.php?controller=categories&toast=deleted');
+            break;
 
      }
 

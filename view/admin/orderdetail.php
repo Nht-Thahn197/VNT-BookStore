@@ -51,6 +51,12 @@ if ($page > $totalPages) {
 }
 $offset = ($page - 1) * $perPage;
 $pagedDetails = array_slice($detailRows, $offset, $perPage);
+$invoiceIdDisplay = null;
+if (!empty($detailRows) && isset($detailRows[0]['invoice_id'])) {
+    $invoiceIdDisplay = $detailRows[0]['invoice_id'];
+} elseif (isset($_GET['id'])) {
+    $invoiceIdDisplay = (int)$_GET['id'];
+}
 
 $paginationController = isset($_GET['controller']) ? $_GET['controller'] : 'order';
 function admin_page_url($pageNum, $controllerDefault) {
@@ -62,8 +68,6 @@ function admin_page_url($pageNum, $controllerDefault) {
     return 'index.php?' . http_build_query($params);
 }
 ?>
-
-">
 <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
     <div class="row">
         <ol class="breadcrumb">
@@ -89,8 +93,8 @@ function admin_page_url($pageNum, $controllerDefault) {
                         <tr>
                             <th data-field="book" data-sortable="true">Mã hóa đơn</th>
                             <th data-field="book" data-sortable="true">Sản Phẩm</th>
-                            <th data-field="id" data-sortable="true">Amount</th>
-                            <th data-field="email" data-sortable="true">Price</th>
+                            <th data-field="id" data-sortable="true">Số lượng</th>
+                            <th data-field="email" data-sortable="true">Giá</th>
 
                         </tr>
                         </thead>
@@ -99,10 +103,19 @@ function admin_page_url($pageNum, $controllerDefault) {
                         foreach ($pagedDetails as $order){
                             ?>
                             <tr>
-                                <td style=""><?=$order['id_invoice']?></td>
-                                <td style=""><?=$order['name']?></td>
-                                <td style=""><?=$order['amount']?></td>
-                                <td style=""><?=$order['price']?></td>
+                                <?php $displayInvoiceId = isset($order['invoice_id']) ? $order['invoice_id'] : $invoiceIdDisplay; ?>
+                                <td><?= $displayInvoiceId !== null ? $displayInvoiceId : '' ?></td>
+                                <td><?= isset($order['book_name']) ? $order['book_name'] : '' ?></td>
+                                <td><?=$order['quantity']?></td>
+                                <td>
+                                    <?php
+                                    if (isset($order['unit_price'])) {
+                                        echo number_format((float)$order['unit_price'], 0, ',', '.') . ' &#8363;';
+                                    } else {
+                                        echo '-';
+                                    }
+                                    ?>
+                                </td>
                             </tr>
                             <?php
                         }

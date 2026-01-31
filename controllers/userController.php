@@ -21,7 +21,7 @@ switch ($action){
     case 'store':
         include_once "models/userModels.php";
         storeUser();
-        header('Location:index.php?controller=user');
+        header('Location:index.php?controller=user&toast=created');
         break;
     case 'edit':
         include_once "models/userModels.php";
@@ -31,12 +31,12 @@ switch ($action){
     case 'update':
         include_once "models/userModels.php";
         updateUser();
-        header('Location:index.php?controller=user');
+        header('Location:index.php?controller=user&toast=updated');
         break;
     case 'remove':
         include_once "models/userModels.php";
         removeUser();
-        header('Location:index.php?controller=user');
+        header('Location:index.php?controller=user&toast=deleted');
         break;
 }
 ?>

@@ -38,6 +38,91 @@ function registerCustomer(){
     include_once "connect/closeConnect.php";
 }
 
+function account(){
+    $customerId = isset($_SESSION['customer_id']) ? (int)$_SESSION['customer_id'] : 0;
+    if ($customerId <= 0) {
+        return array(
+            'customer' => null,
+            'orders' => array(),
+        );
+    }
+
+    include "connect/openConnect.php";
+    if (!isset($connect) || !$connect) {
+        return;
+    }
+    $customer = null;
+    $customerResult = mysqli_query($connect, "SELECT id, name, email, phone, address FROM customer WHERE id = $customerId LIMIT 1");
+    if ($customerResult && mysqli_num_rows($customerResult) > 0) {
+        $customer = mysqli_fetch_assoc($customerResult);
+    }
+
+    $orders = array();
+    $ordersSql = "SELECT invoice.id,
+                         invoice.date_time,
+                         invoice.status,
+                         invoice.payment_method,
+                         COALESCE(NULLIF(invoice.total_amount, 0), totals.total_amount, 0) AS total_amount
+                  FROM invoice
+                  LEFT JOIN (
+                      SELECT invoice_id, SUM(quantity * unit_price) AS total_amount
+                      FROM detailed_invoice
+                      GROUP BY invoice_id
+                  ) totals ON totals.invoice_id = invoice.id
+                  WHERE invoice.customer_id = $customerId
+                  ORDER BY invoice.date_time DESC, invoice.id DESC";
+    $ordersResult = mysqli_query($connect, $ordersSql);
+    if ($ordersResult) {
+        while ($row = mysqli_fetch_assoc($ordersResult)) {
+            $orders[] = $row;
+        }
+    }
+
+    include_once "connect/closeConnect.php";
+    return array(
+        'customer' => $customer,
+        'orders' => $orders,
+    );
+}
+
+function update_account() {
+    $customerId = isset($_SESSION['customer_id']) ? (int)$_SESSION['customer_id'] : 0;
+    if ($customerId <= 0) {
+        return;
+    }
+    $lastName = isset($_POST['customer_last_name']) ? trim((string)$_POST['customer_last_name']) : '';
+    $firstName = isset($_POST['customer_first_name']) ? trim((string)$_POST['customer_first_name']) : '';
+    $name = trim($lastName . ' ' . $firstName);
+    $phone = isset($_POST['customer_phone']) ? trim((string)$_POST['customer_phone']) : '';
+    $city = isset($_POST['customer_city']) ? trim((string)$_POST['customer_city']) : '';
+    $ward = isset($_POST['customer_ward']) ? trim((string)$_POST['customer_ward']) : '';
+    $detail = isset($_POST['customer_address_detail']) ? trim((string)$_POST['customer_address_detail']) : '';
+    $addressParts = array();
+    if ($detail !== '') {
+        $addressParts[] = $detail;
+    }
+    if ($ward !== '') {
+        $addressParts[] = $ward;
+    }
+    if ($city !== '') {
+        $addressParts[] = $city;
+    }
+    $address = implode(', ', $addressParts);
+
+    include "connect/openConnect.php";
+    if (!isset($connect) || !$connect) {
+        return;
+    }
+    $nameEscaped = mysqli_real_escape_string($connect, $name);
+    $phoneEscaped = mysqli_real_escape_string($connect, $phone);
+    $addressEscaped = mysqli_real_escape_string($connect, $address);
+    $sql = "UPDATE customer
+            SET name = '$nameEscaped', phone = '$phoneEscaped', address = '$addressEscaped'
+            WHERE id = $customerId";
+    mysqli_query($connect, $sql);
+    include_once "connect/closeConnect.php";
+}
+
 function edit(){
     $cusid = $_GET['id'];
     include_once "connect/openConnect.php";
@@ -135,6 +220,12 @@ switch ($action){
         break;
     case 'logout':
         logout();
+        break;
+    case 'account':
+        $account = account();
+        break;
+    case 'account_update':
+        update_account();
         break;
 }
 ?>

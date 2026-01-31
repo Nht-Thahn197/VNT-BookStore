@@ -66,7 +66,7 @@
                                 <input class="form-control" placeholder="Địa chỉ" name="customer_add" type="text" required>
                             </div>
                             <div class="form-group">
-                                <input class="form-control" placeholder="Số điện thoại (không bắt buộc)" name="customer_phone" type="text">
+                                <input class="form-control" placeholder="Số điện thoại (không bắt buộc)" name="customer_phone" type="text" maxlength="15" inputmode="tel">
                             </div>
                             <button type="submit" class="btn btn-success">Đăng ký</button>
                             <a href="#login" class="btn btn-default btn-block" id="show-login">Đã có tài khoản? Đăng nhập</a>

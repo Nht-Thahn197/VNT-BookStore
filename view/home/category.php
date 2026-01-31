@@ -39,10 +39,16 @@
             <?php } ?>
             <div class="row bg-white">
                 <?php foreach ($array['book'] as $boo) { ?>
+                <?php
+                    $isOutOfStock = (isset($boo['status']) && $boo['status'] === 'out_of_stock') || (isset($boo['amount']) && (int)$boo['amount'] <= 0);
+                ?>
                 <div class="product__panel-item col-6 col-sm-6 col-md-4 col-lg-3">
-                    <div class="product__panel-item-card">
+                    <div class="product__panel-item-card <?= $isOutOfStock ? 'is-out-of-stock' : '' ?>">
                         <div class="product__panel-img-wrap">
-                            <img src="view/home/images1/product/<?= $boo['image']?>" alt="" class="product__panel-img">
+                            <img src="<?= htmlspecialchars(home_product_image_path($boo['image']), ENT_QUOTES) ?>" alt="" class="product__panel-img">
+                            <?php if ($isOutOfStock) { ?>
+                                <div class="product__panel-outstock">HẾT HÀNG</div>
+                            <?php } ?>
                         </div>
                         <h3 class="product__panel-heading">
                             <a href="index.php?controller=home&action=detail&id=<?=$boo['id']?>" class="product__panel-link"><?= $boo['name']?></a>

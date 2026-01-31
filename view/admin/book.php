@@ -38,12 +38,59 @@ function admin_normalize_rows($data) {
     return array();
 }
 
+function admin_lower_text($value) {
+    if (function_exists('mb_strtolower')) {
+        return mb_strtolower($value, 'UTF-8');
+    }
+    return strtolower($value);
+}
+
 $bookRows = admin_normalize_rows(isset($array['book']) ? $array['book'] : array());
 $categoryRows = admin_normalize_rows(isset($array['categories']) ? $array['categories'] : array());
 
+$categoryMap = array();
+foreach ($categoryRows as $category) {
+    if (isset($category['id'])) {
+        $categoryMap[$category['id']] = isset($category['name']) ? $category['name'] : $category['id'];
+    }
+}
+
+$filterTerm = isset($_GET['filter_term']) ? trim((string)$_GET['filter_term']) : '';
+$filterCategory = isset($_GET['filter_category']) ? trim((string)$_GET['filter_category']) : '';
+$filterCategoryLabel = 'Tất cả danh mục';
+if ($filterCategory !== '') {
+    if (isset($categoryMap[$filterCategory])) {
+        $filterCategoryLabel = $categoryMap[$filterCategory];
+    } else {
+        $filterCategoryLabel = $filterCategory;
+    }
+}
+
+$filteredBooks = $bookRows;
+if ($filterTerm !== '' || $filterCategory !== '') {
+    $filteredBooks = array_values(array_filter($bookRows, function ($row) use ($filterTerm, $filterCategory) {
+        $matchTerm = true;
+        if ($filterTerm !== '') {
+            $rowId = isset($row['id']) ? (string)$row['id'] : '';
+            $rowName = isset($row['name']) ? (string)$row['name'] : '';
+            $termLower = admin_lower_text($filterTerm);
+            $matchTerm = (strpos($rowId, $filterTerm) !== false)
+                || (strpos(admin_lower_text($rowName), $termLower) !== false);
+        }
+
+        $matchCategory = true;
+        if ($filterCategory !== '') {
+            $rowCategory = isset($row['category_id']) ? (string)$row['category_id'] : '';
+            $matchCategory = ($rowCategory === $filterCategory);
+        }
+
+        return $matchTerm && $matchCategory;
+    }));
+}
+
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $perPage = 10;
-$totalItems = count($bookRows);
+$totalItems = count($filteredBooks);
 $totalPages = (int)ceil($totalItems / $perPage);
 if ($totalPages < 1) {
     $totalPages = 1;
@@ -52,7 +99,7 @@ if ($page > $totalPages) {
     $page = $totalPages;
 }
 $offset = ($page - 1) * $perPage;
-$pagedBooks = array_slice($bookRows, $offset, $perPage);
+$pagedBooks = array_slice($filteredBooks, $offset, $perPage);
 
 $paginationController = isset($_GET['controller']) ? $_GET['controller'] : 'book';
 function admin_page_url($pageNum, $controllerDefault) {
@@ -64,8 +111,6 @@ function admin_page_url($pageNum, $controllerDefault) {
     return 'index.php?' . http_build_query($params);
 }
 ?>
-
-">
     <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
         <div class="row">
             <ol class="breadcrumb">
@@ -89,6 +134,42 @@ function admin_page_url($pageNum, $controllerDefault) {
         </div>
         <div class="row">
             <div class="col-lg-12">
+                <form class="form-inline" method="get" action="index.php" style="margin: 12px 0 20px;">
+                    <input type="hidden" name="controller" value="book">
+                    <div class="form-group">
+                        <label class="sr-only" for="filter-term">Theo mã hoặc tên sản phẩm</label>
+                        <input id="filter-term" type="text" name="filter_term" class="form-control" placeholder="Theo mã hoặc tên sản phẩm" value="<?= htmlspecialchars($filterTerm, ENT_QUOTES) ?>">
+                    </div>
+                    <div class="form-group" style="margin-left: 8px;">
+                        <label class="sr-only" for="filter-category">Danh mục</label>
+                        <div class="custom-select" data-name="filter_category">
+                            <input type="hidden" name="filter_category" value="<?= htmlspecialchars($filterCategory, ENT_QUOTES) ?>">
+                            <button type="button" class="custom-select__trigger" id="filter-category">
+                                <span class="custom-select__value"><?= htmlspecialchars($filterCategoryLabel, ENT_QUOTES) ?></span>
+                                <span class="custom-select__arrow"><i class="fas fa-chevron-down"></i></span>
+                            </button>
+                            <div class="custom-select__menu">
+                                <button type="button" class="custom-select__option <?= $filterCategory === '' ? 'is-selected' : '' ?>" data-value="">Tất cả danh mục</button>
+                                <?php foreach ($categoryRows as $category) { ?>
+                                    <?php
+                                    $catId = isset($category['id']) ? (string)$category['id'] : '';
+                                    $catName = isset($category['name']) ? $category['name'] : $catId;
+                                    $isSelected = ($catId !== '' && $catId === $filterCategory) ? 'is-selected' : '';
+                                    ?>
+                                    <button type="button" class="custom-select__option <?= $isSelected ?>" data-value="<?= htmlspecialchars($catId, ENT_QUOTES) ?>">
+                                        <?= htmlspecialchars($catName, ENT_QUOTES) ?>
+                                    </button>
+                                <?php } ?>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-left: 8px;">Lọc</button>
+                    <a class="btn btn-default" href="index.php?controller=book" style="margin-left: 6px;">Xóa lọc</a>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <table data-toolbar="#toolbar" class="table" data-toggle="table">
@@ -105,19 +186,13 @@ function admin_page_url($pageNum, $controllerDefault) {
                             </thead>
                             <tbody>
                             <?php
-                            $categoryMap = array();
-                            foreach ($categoryRows as $category) {
-                                if (isset($category['id'])) {
-                                    $categoryMap[$category['id']] = isset($category['name']) ? $category['name'] : $category['id'];
-                                }
-                            }
                             foreach ($pagedBooks as $product){
                                 ?>
                                 <tr>
                                     <td style=""><?=$product['id']?></td>
                                     <td style="">
                                         <?php
-                                        $catId = $product['id_categories'];
+                                        $catId = $product['category_id'];
                                         echo isset($categoryMap[$catId]) ? $categoryMap[$catId] : $catId;
                                         ?>
                                     </td>

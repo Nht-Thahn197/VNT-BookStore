@@ -141,11 +141,17 @@
 
                     <div class="row product__panel">
                         <?php foreach ($array['book'] as $boo) { ?>
+                        <?php
+                        $isOutOfStock = (isset($boo['status']) && $boo['status'] === 'out_of_stock') || (isset($boo['amount']) && (int)$boo['amount'] <= 0);
+                        ?>
                         <div class="product__panel-item col-lg-3 col-md-4 col-sm-6">
-                            <div class="product__panel-item-wrap">
+                            <div class="product__panel-item-wrap <?= $isOutOfStock ? 'is-out-of-stock' : '' ?>">
 
                                 <div class="product__panel-img-wrap">
-                                    <img  style=" " src="view/home/images1/product/<?=$boo['image']?>" alt="" class="product__panel-img">
+                                    <img  style=" " src="<?= htmlspecialchars(home_product_image_path($boo['image']), ENT_QUOTES) ?>" alt="" class="product__panel-img">
+                                    <?php if ($isOutOfStock) { ?>
+                                        <div class="product__panel-outstock">HẾT HÀNG</div>
+                                    <?php } ?>
                                 </div>
                                 <h3 class="product__panel-heading">
 

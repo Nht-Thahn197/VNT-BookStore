@@ -90,6 +90,12 @@
 	font-weight: 500;
 }
 
+.product__main-info-cart-btn.is-disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
 .product__main-info-description {
 	color: #333;
 	font-size: 1.4rem;
@@ -469,10 +475,14 @@ input[type=number] {
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 }
 
 .product__panel-img{
-    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
 }
 
 .product__panel-heading {

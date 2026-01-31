@@ -1,9 +1,7 @@
 
 
 
-setTimeout(function(){
-    location.reload();
-}, 60* 1000);
+// Auto-reload removed to prevent unexpected refresh loops.
 
 //Get the button
 var mybutton = document.getElementById("myBtn-scroll");

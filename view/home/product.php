@@ -45,15 +45,21 @@
                 <article class="product__main col-lg-12 col-md-12 col-sm-12">
                     <div class="row">
                         <?php foreach ($book as $boo) { ?>
+                        <?php
+                            $isOutOfStock = (isset($boo['status']) && $boo['status'] === 'out_of_stock') || (isset($boo['amount']) && (int)$boo['amount'] <= 0);
+                        ?>
                         <div class="product__main-img col-lg-4 col-md-4 col-sm-12">
                             <div class="product__main-img-primary">
-                                <img src="view/home/images1/product/<?=$boo['image']?>">
+                                <img src="<?= htmlspecialchars(home_product_image_path($boo['image']), ENT_QUOTES) ?>">
                             </div>
 
 
                         </div>
                         <?php } ?>
                         <?php foreach ($book as $boo) { ?>
+                        <?php
+                            $isOutOfStock = (isset($boo['status']) && $boo['status'] === 'out_of_stock') || (isset($boo['amount']) && (int)$boo['amount'] <= 0);
+                        ?>
                             <div class="product__main-info col-lg-8 col-md-8 col-sm-12">
                                 <div class="product__main-info-breadcrumb">
                                     Trang chủ / Sản phẩm
@@ -89,11 +95,17 @@
                                     </div>-->
 
                                     <div class="product__main-info-cart-btn-wrap">
-                                        <a href="index.php?controller=home&action=add_to_cart&id=<?= $boo['id'] ?>">
-                                        <button class="product__main-info-cart-btn">
-                                            Thêm vào giỏ hàng
-                                        </button>
-                                        </a>
+                                        <?php if ($isOutOfStock) { ?>
+                                            <button class="product__main-info-cart-btn is-disabled" disabled>
+                                                Thêm vào giỏ hàng
+                                            </button>
+                                        <?php } else { ?>
+                                            <a href="index.php?controller=home&action=add_to_cart&id=<?= $boo['id'] ?>">
+                                                <button class="product__main-info-cart-btn">
+                                                    Thêm vào giỏ hàng
+                                                </button>
+                                            </a>
+                                        <?php } ?>
                                     </div>
                                 </div>
 
@@ -133,10 +145,10 @@
                                 <div class="table-responsive">
                                     <table class="table table-bordered">
                                         <tbody>
-                                            <tr><th>Tác giả</th><td> <?=$boo['author']?></td></tr>
+                                            <tr><th>Tác giả</th><td> <?= isset($boo['author_name']) ? $boo['author_name'] : '' ?></td></tr>
                                             <tr><th>Kích thước</th><td> <?=$boo['size']?></td></tr>
                                             <tr><th>Loại bìa</th><td><?=$boo['bookcover']?></td></tr>
-                                            <tr><th>Số trang</th><td><?=$boo['numberpages']?></td></tr>
+                                            <tr><th>Số trang</th><td><?=$boo['number_pages']?></td></tr>
 
                                         </tbody>
                                     </table>

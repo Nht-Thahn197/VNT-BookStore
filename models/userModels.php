@@ -10,11 +10,13 @@ function userList(){
 function storeUser(){
     $name = $_POST['user_name'];
     $email = $_POST['user_email'];
+    $phone = isset($_POST['user_phone']) ? $_POST['user_phone'] : '';
+    $gender = isset($_POST['user_gender']) ? $_POST['user_gender'] : '';
     $password = $_POST['user_pass'];
     include_once "connect/openConnect.php";
     $password = password_hash($password, PASSWORD_DEFAULT);
     $password = mysqli_real_escape_string($connect, $password);
-    $sql = "INSERT INTO user (name,email,password) VALUES('$name','$email','$password')";
+    $sql = "INSERT INTO user (name,email,phone,gender,password) VALUES('$name','$email','$phone','$gender','$password')";
     mysqli_query($connect,$sql);
     include_once "connect/closeConnect.php";
 }
@@ -32,15 +34,17 @@ function updateUser(){
     $userId = (int)$_POST['id'];
     $name = $_POST['user_name'];
     $email = $_POST['user_email'];
+    $phone = isset($_POST['user_phone']) ? $_POST['user_phone'] : '';
+    $gender = isset($_POST['user_gender']) ? $_POST['user_gender'] : '';
     $password = isset($_POST['user_pass']) ? trim($_POST['user_pass']) : '';
     include_once "connect/openConnect.php";
 
     if ($password === '') {
-        $sql = "UPDATE user SET name = '$name', email = '$email' WHERE id = '$userId' ";
+        $sql = "UPDATE user SET name = '$name', email = '$email', phone = '$phone', gender = '$gender' WHERE id = '$userId' ";
     } else {
         $password = password_hash($password, PASSWORD_DEFAULT);
         $password = mysqli_real_escape_string($connect, $password);
-        $sql = "UPDATE user SET name = '$name', email = '$email', password = '$password' WHERE id = '$userId' ";
+        $sql = "UPDATE user SET name = '$name', email = '$email', phone = '$phone', gender = '$gender', password = '$password' WHERE id = '$userId' ";
     }
 
     mysqli_query($connect, $sql);

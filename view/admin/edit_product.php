@@ -44,7 +44,17 @@ if (isset($array['categories'])) {
         $categoryRows = $array['categories'];
     }
 }
-$selectedCategoryId = $bookRow ? $bookRow['id_categories'] : '';
+$authorRows = array();
+if (isset($array['authors'])) {
+    if ($array['authors'] instanceof mysqli_result) {
+        while ($row = $array['authors']->fetch_assoc()) {
+            $authorRows[] = $row;
+        }
+    } elseif (is_array($array['authors'])) {
+        $authorRows = $array['authors'];
+    }
+}
+$selectedCategoryId = $bookRow ? $bookRow['category_id'] : '';
 $selectedCategoryName = '';
 foreach ($categoryRows as $category) {
     if ((int)$category['id'] === (int)$selectedCategoryId) {
@@ -52,10 +62,30 @@ foreach ($categoryRows as $category) {
         break;
     }
 }
+$selectedAuthorId = $bookRow ? (int)$bookRow['author_id'] : '';
+$selectedAuthorName = '';
+foreach ($authorRows as $author) {
+    if ((int)$author['id'] === (int)$selectedAuthorId) {
+        $selectedAuthorName = $author['name'];
+        break;
+    }
+}
+$statusLabels = array(
+    'active' => 'Hoạt động',
+    'inactive' => 'Dừng bán',
+);
+$rawStatus = $bookRow ? (string)$bookRow['status'] : 'active';
+$legacyStatusMap = array(
+    '1' => 'active',
+    '0' => 'active',
+);
+if (array_key_exists($rawStatus, $legacyStatusMap)) {
+    $rawStatus = $legacyStatusMap[$rawStatus];
+}
+$selectedStatus = ($rawStatus === 'inactive') ? 'inactive' : 'active';
+$selectedStatusLabel = isset($statusLabels[$selectedStatus]) ? $statusLabels[$selectedStatus] : $selectedStatus;
 ?>
 <?php include_once 'view/admin/partials/header.php'; ?>
-
-">
         <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">			
 		<div class="row">
 			<ol class="breadcrumb">
@@ -101,6 +131,23 @@ foreach ($categoryRows as $category) {
                                         <label>Tên sản phẩm</label>
                                         <input required name="prd_name" value="<?= $bookRow['name']?>" class="form-control" placeholder="">
                                     </div>
+                                    <div class="form-group">
+                                        <label>Tác giả</label>
+                                        <div class="custom-select" data-name="author_id">
+                                            <input type="hidden" name="author_id" value="<?= $selectedAuthorId ?>">
+                                            <button type="button" class="custom-select__trigger">
+                                                <span class="custom-select__value"><?= $selectedAuthorName ?: 'Chọn tác giả' ?></span>
+                                                <span class="custom-select__arrow"><i class="fas fa-chevron-down"></i></span>
+                                            </button>
+                                            <div class="custom-select__menu">
+                                                <?php foreach ($authorRows as $author) { ?>
+                                                    <button type="button" class="custom-select__option <?= (int)$author['id'] === (int)$selectedAuthorId ? 'is-selected' : '' ?>" data-value="<?= $author['id']?>">
+                                                        <?= $author['name']?>
+                                                    </button>
+                                                <?php } ?>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <div class="form-group">
                                         <label>Giá sản phẩm</label>
@@ -108,21 +155,34 @@ foreach ($categoryRows as $category) {
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Số lượng</label>
-                                        <input required name="prd_amount" value="<?= $bookRow['amount']?>" type="text" class="form-control">
+                                        <label>Kích thước</label>
+                                        <input name="prd_size" value="<?= isset($bookRow['size']) ? $bookRow['size'] : '' ?>" class="form-control" placeholder="">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Bìa sách</label>
+                                        <input name="prd_bookcover" value="<?= isset($bookRow['bookcover']) ? $bookRow['bookcover'] : '' ?>" class="form-control" placeholder="">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Số trang</label>
+                                        <input name="prd_number_pages" value="<?= isset($bookRow['number_pages']) ? $bookRow['number_pages'] : '' ?>" type="number" min="0" class="form-control">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Trạng thái</label>
                                         <div class="custom-select" data-name="prd_status">
-                                            <input type="hidden" name="prd_status" value="<?= $bookRow ? (int)$bookRow['status'] : 0 ?>">
+                                            <input type="hidden" name="prd_status" value="<?= htmlspecialchars($selectedStatus, ENT_QUOTES) ?>">
                                             <button type="button" class="custom-select__trigger">
-                                                <span class="custom-select__value"><?= ($bookRow && (int)$bookRow['status'] === 1) ? 'Còn hàng' : 'Hết hàng' ?></span>
+                                                <span class="custom-select__value"><?= $selectedStatusLabel ?: 'Chon trang thai' ?></span>
                                                 <span class="custom-select__arrow"><i class="fas fa-chevron-down"></i></span>
                                             </button>
                                             <div class="custom-select__menu">
-                                                <button type="button" class="custom-select__option <?= ($bookRow && (int)$bookRow['status'] === 0) ? 'is-selected' : '' ?>" data-value="0">Hết hàng</button>
-                                                <button type="button" class="custom-select__option <?= ($bookRow && (int)$bookRow['status'] === 1) ? 'is-selected' : '' ?>" data-value="1">Còn hàng</button>
+                                                <?php foreach ($statusLabels as $value => $label) { ?>
+                                                    <button type="button" class="custom-select__option <?= $value === $selectedStatus ? 'is-selected' : '' ?>" data-value="<?= htmlspecialchars($value, ENT_QUOTES) ?>">
+                                                        <?= $label ?>
+                                                    </button>
+                                                <?php } ?>
                                             </div>
                                         </div>
                                     </div>
@@ -162,39 +222,6 @@ foreach ($categoryRows as $category) {
 	</div>	<!--/.main-->	
 	<?php include_once 'view/admin/partials/footer.php'; ?>
     <script>
-    document.addEventListener('click', function (event) {
-        const trigger = event.target.closest('.custom-select__trigger');
-        const option = event.target.closest('.custom-select__option');
-        const current = event.target.closest('.custom-select');
-
-        if (trigger && current) {
-            document.querySelectorAll('.custom-select.is-open').forEach(function (el) {
-                if (el !== current) {
-                    el.classList.remove('is-open');
-                }
-            });
-            current.classList.toggle('is-open');
-            return;
-        }
-
-        if (option && current) {
-            const value = option.getAttribute('data-value');
-            const hidden = current.querySelector('input[type=\"hidden\"]');
-            const label = current.querySelector('.custom-select__value');
-            const options = current.querySelectorAll('.custom-select__option');
-            if (hidden) hidden.value = value;
-            if (label) label.textContent = option.textContent.trim();
-            options.forEach(function (el) { el.classList.remove('is-selected'); });
-            option.classList.add('is-selected');
-            current.classList.remove('is-open');
-            return;
-        }
-
-    document.querySelectorAll('.custom-select.is-open').forEach(function (el) {
-        el.classList.remove('is-open');
-    });
-});
-
 const uploadInput = document.querySelector('.image-upload__input');
 const uploadPreview = document.querySelector('.image-upload__preview');
 if (uploadInput && uploadPreview) {

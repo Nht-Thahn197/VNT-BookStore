@@ -21,10 +21,48 @@
 
 </head>
 
-<body data-controller="<?php echo isset($_GET['controller']) ? $_GET['controller'] : 'admin'; ?>">
+<body class="page-edit-product" data-controller="<?php echo isset($_GET['controller']) ? $_GET['controller'] : 'admin'; ?>">
+<?php
+$categoryRows = array();
+if (isset($array['categories'])) {
+    if ($array['categories'] instanceof mysqli_result) {
+        while ($row = $array['categories']->fetch_assoc()) {
+            $categoryRows[] = $row;
+        }
+    } elseif (is_array($array['categories'])) {
+        $categoryRows = $array['categories'];
+    }
+}
+$authorRows = array();
+if (isset($array['authors'])) {
+    if ($array['authors'] instanceof mysqli_result) {
+        while ($row = $array['authors']->fetch_assoc()) {
+            $authorRows[] = $row;
+        }
+    } elseif (is_array($array['authors'])) {
+        $authorRows = $array['authors'];
+    }
+}
+$selectedCategoryId = '';
+$selectedCategoryName = '';
+if ($selectedCategoryId === '' && !empty($categoryRows)) {
+    $selectedCategoryId = $categoryRows[0]['id'];
+    $selectedCategoryName = $categoryRows[0]['name'];
+}
+$selectedAuthorId = '';
+$selectedAuthorName = '';
+if ($selectedAuthorId === '' && !empty($authorRows)) {
+    $selectedAuthorId = $authorRows[0]['id'];
+    $selectedAuthorName = $authorRows[0]['name'];
+}
+$statusLabels = array(
+    'active' => 'Hoạt động',
+    'inactive' => 'Dừng bán',
+);
+$selectedStatus = 'active';
+$selectedStatusLabel = isset($statusLabels[$selectedStatus]) ? $statusLabels[$selectedStatus] : $selectedStatus;
+?>
 <?php include_once 'view/admin/partials/header.php'; ?>
-
-">
 	<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">			
 		<div class="row">
 			<ol class="breadcrumb">
@@ -47,26 +85,79 @@
                                     <form role="form" method="post" enctype="multipart/form-data" action="index.php?controller=book&action=store">
                                                 <div class="form-group">
                                                     <label>Danh mục</label>
-                                                    <select name="cat_id" class="form-control">
-                                                        <?php foreach($array['categories'] as $category ){ ?>
-                                                            <option value=<?= $category['id']?>><?= $category['name']?></option>
-
-                                                        <?php } ?>
-                                                    </select>
+                                                    <div class="custom-select" data-name="cat_id">
+                                                        <input type="hidden" name="cat_id" value="<?= $selectedCategoryId ?>">
+                                                        <button type="button" class="custom-select__trigger">
+                                                            <span class="custom-select__value"><?= $selectedCategoryName ?: 'Chá»n danh má»¥c' ?></span>
+                                                            <span class="custom-select__arrow"><i class="fas fa-chevron-down"></i></span>
+                                                        </button>
+                                                        <div class="custom-select__menu">
+                                                            <?php foreach ($categoryRows as $category) { ?>
+                                                                <button type="button" class="custom-select__option <?= (int)$category['id'] === (int)$selectedCategoryId ? 'is-selected' : '' ?>" data-value="<?= $category['id']?>">
+                                                                    <?= $category['name']?>
+                                                                </button>
+                                                            <?php } ?>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Tên sản phẩm</label>
                                                     <input required name="prd_name" class="form-control" placeholder="">
                                                 </div>
-
                                                 <div class="form-group">
-                                                    <label>Giá sản phẩm</label>
-                                                    <input required name="prd_price" type="number" min="1000" class="form-control">
+                                                    <label>Tác giả</label>
+                                                    <div class="custom-select" data-name="author_id">
+                                                        <input type="hidden" name="author_id" value="<?= $selectedAuthorId ?>">
+                                                        <button type="button" class="custom-select__trigger">
+                                                            <span class="custom-select__value"><?= $selectedAuthorName ?: 'Chọn tác giả' ?></span>
+                                                            <span class="custom-select__arrow"><i class="fas fa-chevron-down"></i></span>
+                                                        </button>
+                                                        <div class="custom-select__menu">
+                                                            <?php foreach ($authorRows as $author) { ?>
+                                                                <button type="button" class="custom-select__option <?= (int)$author['id'] === (int)$selectedAuthorId ? 'is-selected' : '' ?>" data-value="<?= $author['id']?>">
+                                                                    <?= $author['name']?>
+                                                                </button>
+                                                            <?php } ?>
+                                                        </div>
+                                                    </div>
                                                 </div>
 
                                                 <div class="form-group">
-                                                    <label>Số lượng</label>
-                                                    <input required name="prd_amount" type="number" class="form-control">
+                                                    <label>Giá sản phẩm</label>
+                                                    <input required name="prd_price" type="text" min="1000" class="form-control">
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Kích thước</label>
+                                                    <input name="prd_size" class="form-control" placeholder="">
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Bìa sách</label>
+                                                    <input name="prd_bookcover" class="form-control" placeholder="">
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Số trang</label>
+                                                    <input name="prd_number_pages" type="number" min="0" class="form-control">
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Trạng thái</label>
+                                                    <div class="custom-select" data-name="prd_status">
+                                                        <input type="hidden" name="prd_status" value="<?= htmlspecialchars($selectedStatus, ENT_QUOTES) ?>">
+                                                        <button type="button" class="custom-select__trigger">
+                                                            <span class="custom-select__value"><?= $selectedStatusLabel ?: 'Chọn trạng thái' ?></span>
+                                                            <span class="custom-select__arrow"><i class="fas fa-chevron-down"></i></span>
+                                                        </button>
+                                                        <div class="custom-select__menu">
+                                                            <?php foreach ($statusLabels as $value => $label) { ?>
+                                                                <button type="button" class="custom-select__option <?= $value === $selectedStatus ? 'is-selected' : '' ?>" data-value="<?= htmlspecialchars($value, ENT_QUOTES) ?>">
+                                                                    <?= $label ?>
+                                                                </button>
+                                                            <?php } ?>
+                                                        </div>
+                                                    </div>
                                                 </div>
 
                                             </div>
@@ -82,31 +173,28 @@
 <!--                                            </div>-->
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label>Image</label>
-                                                    <div class="input-group">
-                                                        <div class="custom-file">
-                                                            <input type="file" class="custom-file-input"  name="pro_image"  type="file"  id="inputGroupFile04" >
-                                                            <label class="custom-file-label" for="inputGroupFile04">Choose file</label>
+                                                    <label>ảnh sản phẩm</label>
+                                                    <div class="image-upload">
+                                                        <input type="file" name="prd_image" class="form-control image-upload__input">
+                                                        <div class="image-upload__preview">
+                                                            <span class="image-upload__placeholder">Chưa có ảnh</span>
                                                         </div>
                                                     </div>
-
-
-                                                    <div>
-                                                        <img src="\BookStore\view\admin\images\" id="prdImage" style="width: 200px; height: 200px;">
-                                                    </div>
                                                 </div>
-                                                </div>
+                                            <!--
                                             <div class="form-group">
                                                 <label>Trạng thái</label>
                                                 <select name="prd_status" class="form-control">
-                                                    <option value=1 selected>Còn hàng</option>
-                                                    <option value=0>Hết hàng</option>
+                                                    <option value="active" selected>Còn hàng</option>
+                                                    <option value="out_of_stock">Hết hàng</option>
+                                                    <option value="inactive">Tạm ngưng</option>
                                                 </select>
                                             </div>
+                                            -->
 
                                             <div class="form-group">
                                                 <label>nội dung</label>
-                                                <textarea required name="prd_content" class="form-control" rows="3"></textarea>
+                                                <textarea required name="prd_content" class="form-control" rows="8"></textarea>
                                             </div>
                                             <button name="sbm" type="submit" class="btn btn-success">Thêm mới</button>
                                         </div>
@@ -117,6 +205,22 @@
             </div><!-- /.row -->
 	</div>	<!--/.main-->
     <?php include_once 'view/admin/partials/footer.php'; ?>
+    <script>
+const uploadInput = document.querySelector('.image-upload__input');
+const uploadPreview = document.querySelector('.image-upload__preview');
+if (uploadInput && uploadPreview) {
+    uploadInput.addEventListener('change', function () {
+        const file = uploadInput.files && uploadInput.files[0];
+        if (!file) return;
+        const img = document.createElement('img');
+        img.className = 'image-upload__img';
+        img.alt = file.name;
+        img.src = URL.createObjectURL(file);
+        uploadPreview.innerHTML = '';
+        uploadPreview.appendChild(img);
+    });
+}
+    </script>
 </body>
 
 </html>

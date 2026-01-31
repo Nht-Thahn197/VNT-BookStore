@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -38,42 +37,12 @@ function admin_normalize_rows($data) {
     return array();
 }
 
-function admin_lower_text($value) {
-    if (function_exists('mb_strtolower')) {
-        return mb_strtolower($value, 'UTF-8');
-    }
-    return strtolower($value);
-}
-
-function admin_status_label($value) {
-    if ($value === 'pending') {
-        return 'Chưa duyệt';
-    }
-    if ($value === 'approved') {
-        return 'Đã duyệt';
-    }
-    if ($value === '') {
-        return '-';
-    }
-    return 'Đã hoàn thành';
-}
-
-function admin_payment_label($value) {
-    if ($value === 'transfer') {
-        return 'Chuyển khoản';
-    }
-    if ($value === 'cash') {
-        return 'Tiền mặt';
-    }
-    return $value !== '' ? $value : '-';
-}
-
 function admin_parse_date($value) {
     $value = trim($value);
     if ($value === '') {
         return null;
     }
-    $parts = preg_split('/[\\/\\-]/', $value);
+    $parts = preg_split('/[\/\-]/', $value);
     if (count($parts) !== 3) {
         return null;
     }
@@ -96,28 +65,24 @@ function admin_format_date_dmy($value) {
     return $value;
 }
 
-$orderRows = admin_normalize_rows(isset($invoice) ? $invoice : array());
-$filterOrderId = isset($_GET['filter_order_id']) ? trim((string)$_GET['filter_order_id']) : '';
-$filterCustomerName = isset($_GET['filter_customer_name']) ? trim((string)$_GET['filter_customer_name']) : '';
+function import_status_label($value) {
+    if ($value === 'canceled') {
+        return 'Đã hủy';
+    }
+    return 'Đã hoàn thành';
+}
+
+$receiptRows = admin_normalize_rows(isset($receipts) ? $receipts : array());
+$filterCode = isset($_GET['filter_code']) ? trim((string)$_GET['filter_code']) : '';
+$filterProduct = isset($_GET['filter_product']) ? trim((string)$_GET['filter_product']) : '';
+$filterUser = isset($_GET['filter_user']) ? trim((string)$_GET['filter_user']) : '';
 $filterDateRange = isset($_GET['filter_date_range']) ? trim((string)$_GET['filter_date_range']) : '';
 $filterDateFrom = isset($_GET['filter_date_from']) ? trim((string)$_GET['filter_date_from']) : '';
 $filterDateTo = isset($_GET['filter_date_to']) ? trim((string)$_GET['filter_date_to']) : '';
 $filterStatus = isset($_GET['filter_status']) ? trim((string)$_GET['filter_status']) : '';
-$filterPayment = isset($_GET['filter_payment']) ? trim((string)$_GET['filter_payment']) : '';
 
-$statusOptions = array('' => 'Tất cả trạng thái');
-$paymentOptions = array('' => 'Tất cả thanh toán');
-foreach ($orderRows as $orderRow) {
-    if (isset($orderRow['status']) && $orderRow['status'] !== '' && !isset($statusOptions[$orderRow['status']])) {
-        $statusOptions[$orderRow['status']] = admin_status_label($orderRow['status']);
-    }
-    if (isset($orderRow['payment_method']) && $orderRow['payment_method'] !== '' && !isset($paymentOptions[$orderRow['payment_method']])) {
-        $paymentOptions[$orderRow['payment_method']] = admin_payment_label($orderRow['payment_method']);
-    }
-}
-
-$filterStatusLabel = isset($statusOptions[$filterStatus]) ? $statusOptions[$filterStatus] : ($filterStatus !== '' ? $filterStatus : 'Tất cả trạng thái');
-$filterPaymentLabel = isset($paymentOptions[$filterPayment]) ? $paymentOptions[$filterPayment] : ($filterPayment !== '' ? $filterPayment : 'Tất cả thanh toán');
+$statusOptions = array('' => 'Tất cả trạng thái', 'completed' => 'Đã hoàn thành', 'canceled' => 'Đã hủy');
+$filterStatusLabel = isset($statusOptions[$filterStatus]) ? $statusOptions[$filterStatus] : 'Tất cả trạng thái';
 
 $filterDateRangeValue = $filterDateRange;
 if ($filterDateRange !== '') {
@@ -146,64 +111,9 @@ if ($filterDateRangeValue === '' && ($filterDateFrom !== '' || $filterDateTo !==
     }
 }
 
-$fromTs = $filterDateFrom !== '' ? strtotime($filterDateFrom . ' 00:00:00') : null;
-$toTs = $filterDateTo !== '' ? strtotime($filterDateTo . ' 23:59:59') : null;
-if ($fromTs === false) {
-    $fromTs = null;
-}
-if ($toTs === false) {
-    $toTs = null;
-}
-
-$filteredOrders = $orderRows;
-if ($filterOrderId !== '' || $filterCustomerName !== '' || $filterDateFrom !== '' || $filterDateTo !== '' || $filterStatus !== '' || $filterPayment !== '') {
-    $filteredOrders = array_values(array_filter($orderRows, function ($row) use ($filterOrderId, $filterCustomerName, $filterStatus, $filterPayment, $fromTs, $toTs) {
-        $matchId = true;
-        if ($filterOrderId !== '') {
-            $rowId = isset($row['id']) ? (string)$row['id'] : '';
-            $matchId = strpos($rowId, $filterOrderId) !== false;
-        }
-
-        $matchName = true;
-        if ($filterCustomerName !== '') {
-            $rowName = isset($row['name']) ? (string)$row['name'] : '';
-            $matchName = strpos(admin_lower_text($rowName), admin_lower_text($filterCustomerName)) !== false;
-        }
-
-        $matchStatus = true;
-        if ($filterStatus !== '') {
-            $rowStatus = isset($row['status']) ? (string)$row['status'] : '';
-            $matchStatus = ($rowStatus === $filterStatus);
-        }
-
-        $matchPayment = true;
-        if ($filterPayment !== '') {
-            $rowPayment = isset($row['payment_method']) ? (string)$row['payment_method'] : '';
-            $matchPayment = ($rowPayment === $filterPayment);
-        }
-
-        $matchDate = true;
-        if ($fromTs !== null || $toTs !== null) {
-            $orderTs = (!empty($row['date_time'])) ? strtotime($row['date_time']) : false;
-            if ($orderTs === false) {
-                $matchDate = false;
-            } else {
-                if ($fromTs !== null && $orderTs < $fromTs) {
-                    $matchDate = false;
-                }
-                if ($toTs !== null && $orderTs > $toTs) {
-                    $matchDate = false;
-                }
-            }
-        }
-
-        return $matchId && $matchName && $matchStatus && $matchPayment && $matchDate;
-    }));
-}
-
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $perPage = 10;
-$totalItems = count($filteredOrders);
+$totalItems = count($receiptRows);
 $totalPages = (int)ceil($totalItems / $perPage);
 if ($totalPages < 1) {
     $totalPages = 1;
@@ -212,9 +122,9 @@ if ($page > $totalPages) {
     $page = $totalPages;
 }
 $offset = ($page - 1) * $perPage;
-$pagedOrders = array_slice($filteredOrders, $offset, $perPage);
+$pagedReceipts = array_slice($receiptRows, $offset, $perPage);
 
-$paginationController = isset($_GET['controller']) ? $_GET['controller'] : 'order';
+$paginationController = isset($_GET['controller']) ? $_GET['controller'] : 'import';
 function admin_page_url($pageNum, $controllerDefault) {
     $params = $_GET;
     if (!isset($params['controller'])) {
@@ -228,29 +138,37 @@ function admin_page_url($pageNum, $controllerDefault) {
     <div class="row">
         <ol class="breadcrumb">
             <li><a href="http://localhost/BookStore/index.php?controller=admin"><svg class="glyph stroked home"><use xlink:href="#stroked-home"></use></svg></a></li>
-            </svg></a></li>
-            <li class="active">Danh sách đơn hàng</li>
+            <li class="active">Phiếu nhập hàng</li>
         </ol>
     </div>
     <!--/.row-->
 
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Danh sách đơn hàng</h1>
+            <h1 class="page-header">Phiếu nhập hàng</h1>
         </div>
     </div>
     <!--/.row-->
+    <div id="toolbar" class="btn-group">
+        <a href="index.php?controller=import&action=create" class="btn btn-success">
+            <i class="glyphicon glyphicon-plus"></i> Nhập hàng
+        </a>
+    </div>
     <div class="row">
         <div class="col-lg-12">
             <form class="form-inline" method="get" action="index.php" style="margin: 12px 0 20px;">
-                <input type="hidden" name="controller" value="order">
+                <input type="hidden" name="controller" value="import">
                 <div class="form-group">
-                    <label class="sr-only" for="filter-order-id">Mã đơn hàng</label>
-                    <input id="filter-order-id" type="text" name="filter_order_id" class="form-control" placeholder="Mã đơn hàng" value="<?= htmlspecialchars($filterOrderId, ENT_QUOTES) ?>">
+                    <label class="sr-only" for="filter-code">Mã phiếu</label>
+                    <input id="filter-code" type="text" name="filter_code" class="form-control" placeholder="Mã phiếu nhập" value="<?= htmlspecialchars($filterCode, ENT_QUOTES) ?>">
                 </div>
                 <div class="form-group" style="margin-left: 8px;">
-                    <label class="sr-only" for="filter-customer-name">Tên khách hàng</label>
-                    <input id="filter-customer-name" type="text" name="filter_customer_name" class="form-control" placeholder="Tên khách hàng" value="<?= htmlspecialchars($filterCustomerName, ENT_QUOTES) ?>">
+                    <label class="sr-only" for="filter-product">Tên hàng hóa</label>
+                    <input id="filter-product" type="text" name="filter_product" class="form-control" placeholder="Tên hàng hóa" value="<?= htmlspecialchars($filterProduct, ENT_QUOTES) ?>">
+                </div>
+                <div class="form-group" style="margin-left: 8px;">
+                    <label class="sr-only" for="filter-user">Người nhập</label>
+                    <input id="filter-user" type="text" name="filter_user" class="form-control" placeholder="Người nhập" value="<?= htmlspecialchars($filterUser, ENT_QUOTES) ?>">
                 </div>
                 <div class="form-group" style="margin-left: 8px;">
                     <label class="sr-only" for="filter-date-range">Thời gian</label>
@@ -297,26 +215,8 @@ function admin_page_url($pageNum, $controllerDefault) {
                         </div>
                     </div>
                 </div>
-                <div class="form-group" style="margin-left: 8px;">
-                    <label class="sr-only" for="filter-payment">Thanh toan</label>
-                    <div class="custom-select" data-name="filter_payment">
-                        <input type="hidden" name="filter_payment" value="<?= htmlspecialchars($filterPayment, ENT_QUOTES) ?>">
-                        <button type="button" class="custom-select__trigger" id="filter-payment">
-                            <span class="custom-select__value"><?= htmlspecialchars($filterPaymentLabel, ENT_QUOTES) ?></span>
-                            <span class="custom-select__arrow"><i class="fas fa-chevron-down"></i></span>
-                        </button>
-                        <div class="custom-select__menu">
-                            <?php foreach ($paymentOptions as $paymentValue => $paymentLabel) { ?>
-                                <?php $isSelected = ($paymentValue !== '' && $paymentValue === $filterPayment) || ($paymentValue === '' && $filterPayment === ''); ?>
-                                <button type="button" class="custom-select__option <?= $isSelected ? 'is-selected' : '' ?>" data-value="<?= htmlspecialchars($paymentValue, ENT_QUOTES) ?>">
-                                    <?= htmlspecialchars($paymentLabel, ENT_QUOTES) ?>
-                                </button>
-                            <?php } ?>
-                        </div>
-                    </div>
-                </div>
                 <button type="submit" class="btn btn-primary" style="margin-left: 8px;">Lọc</button>
-                <a class="btn btn-default" href="index.php?controller=order" style="margin-left: 6px;">Xóa lọc</a>
+                <a class="btn btn-default" href="index.php?controller=import" style="margin-left: 6px;">Xóa lọc</a>
             </form>
         </div>
     </div>
@@ -327,73 +227,35 @@ function admin_page_url($pageNum, $controllerDefault) {
                     <table data-toolbar="#toolbar" class="table" data-toggle="table">
                         <thead>
                         <tr>
-                            <th data-field="id" data-sortable="true">ID</th>
-                            <th data-field="email" data-sortable="true">Tên</th>
-                            <th data-field="book" data-sortable="true">Thời gian</th>
-                            <th>Thanh toán</th>
-                            <th>Tổng tiền</th>
+                            <th data-field="id" data-sortable="true">Mã phiếu nhập</th>
+                            <th data-field="date" data-sortable="true">Thời gian</th>
+                            <th>Người nhập</th>
+                            <th>Tổng tiền hàng</th>
                             <th>Trạng thái</th>
                             <th>Hành động</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <?php
-                        foreach ($pagedOrders as $order){
-                            ?>
+                        <?php foreach ($pagedReceipts as $receipt) { ?>
                             <tr>
-                                <td style=""><?=$order['id']?></td>
-                                <td style=""><?=$order['name']?></td>
-                                <td style="">
+                                <td><?= $receipt['id'] ?></td>
+                                <td>
                                     <?php
-                                    if (!empty($order['date_time'])) {
-                                        echo date('H:i d-m-Y', strtotime($order['date_time']));
+                                    if (!empty($receipt['date_time'])) {
+                                        echo date('H:i d-m-Y', strtotime($receipt['date_time']));
                                     } else {
                                         echo '-';
                                     }
                                     ?>
                                 </td>
-                                <td style="">
-                                    <?php
-                                    if ($order['payment_method'] === 'transfer') {
-                                        echo 'Chuyển khoản';
-                                    } elseif ($order['payment_method'] === 'cash') {
-                                        echo 'Tiền mặt';
-                                    } else {
-                                        echo '-';
-                                    }
-                                    ?>
-                                </td>
-                                <td style="">
-                                    <?php
-                                    $totalAmount = isset($order['total_amount']) ? (float)$order['total_amount'] : 0;
-                                    echo number_format($totalAmount, 0, ',', '.') . ' &#8363;';
-                                    ?>
-                                </td>
-                                <td style="">
-                                    <?php
-                                    if ($order['status'] === 'pending'){
-                                        echo'Chưa duyệt';
-                                    }elseif ($order['status'] === 'approved'){
-                                        echo'Đã duyệt';
-                                    }else{
-                                        echo'Đã hoàn thành';
-                                    }
-                                    ?>
-                                </td>
+                                <td><?= isset($receipt['user_name']) && $receipt['user_name'] !== '' ? htmlspecialchars($receipt['user_name'], ENT_QUOTES) : '-' ?></td>
+                                <td><?= number_format((float)$receipt['total_amount'], 0, ',', '.') ?> ₫</td>
+                                <td><?= import_status_label(isset($receipt['status']) ? $receipt['status'] : '') ?></td>
                                 <td class="form-group">
-                                    <?php if ($order['status'] === 'pending') { ?>
-                                        <a onclick="alert('Đã duyệt đơn hàng')" href="index.php?controller=order&action=edit&id=<?= $order['id']?>" class="btn btn-primary">Duyệt</a>
-                                    <?php } elseif ($order['status'] === 'approved') { ?>
-                                        <a onclick="alert('Đã hoàn tất đơn hàng')" href="index.php?controller=order&action=edit&id=<?= $order['id']?>" class="btn btn-success">Hoàn tất</a>
-                                    <?php } else { ?>
-                                        <button class="btn btn-default" disabled>Đã hoàn thành</button>
-                                    <?php } ?>
-                                    <a href="index.php?controller=order&action=detail&id=<?= $order['id']?>" class="btn btn-primary"><i class="glyphicon glyphicon-pencil"></i></a>
+                                    <a href="index.php?controller=import&action=detail&id=<?= $receipt['id']?>" class="btn btn-primary">Xem chi tiết</a>
                                 </td>
                             </tr>
-                            <?php
-                        }
-                        ?>
+                        <?php } ?>
                         </tbody>
                     </table>
                 </div>
