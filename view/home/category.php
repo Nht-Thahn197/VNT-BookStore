@@ -16,8 +16,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="view/home/css/style.css">
     <link rel="stylesheet" href="view/home/css/home.css">
- <link rel="stylesheet" href="view/home/css/category.css">
- <link rel="stylesheet" href="view/home/fonts/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="view/home/css/category.css">
+    <link rel="stylesheet" href="view/home/fonts/fontawesome/css/all.min.css">
 </head>
 <body class="page-category">
     <!-- header -->
@@ -53,12 +53,11 @@
                         <h3 class="product__panel-heading">
                             <a href="index.php?controller=home&action=detail&id=<?=$boo['id']?>" class="product__panel-link"><?= $boo['name']?></a>
                         </h3>
+                        <?php $ratingAverage = isset($boo['rating_average']) ? (float)$boo['rating_average'] : 0; ?>
                         <div class="product__panel-rate-wrap">
-                            <i class="fas fa-star product__panel-rate"></i>
-                            <i class="fas fa-star product__panel-rate"></i>
-                            <i class="fas fa-star product__panel-rate"></i>
-                            <i class="fas fa-star product__panel-rate"></i>
-                            <i class="fas fa-star product__panel-rate"></i>
+                            <?php for ($i = 1; $i <= 5; $i++) { ?>
+                                <i class="<?= ($ratingAverage >= $i) ? 'fas' : 'far' ?> fa-star product__panel-rate"></i>
+                            <?php } ?>
                         </div>
 
                         <div class="product__panel-price">

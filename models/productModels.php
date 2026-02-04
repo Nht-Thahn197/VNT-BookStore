@@ -21,16 +21,25 @@ function pick_column_name($columns, $candidates) {
     return null;
 }
 function Product(){
-    include_once "connect/openConnect.php";
+    include "connect/openConnect.php";
     $search = '';
     if (isset($_POST['search'])){
         $search = $_POST['search'];
     }
-    $sql = "SELECT * FROM book where book.name like '%$search%'";
+    $sql = "SELECT book.*,
+                   COALESCE(r.avg_rating, 0) AS rating_average
+            FROM book
+            LEFT JOIN (
+                SELECT product_id, AVG(rating) AS avg_rating
+                FROM product_reviews
+                WHERE status = 'approved'
+                GROUP BY product_id
+            ) r ON r.product_id = book.id
+            WHERE book.name like '%$search%'";
     $book = mysqli_query($connect,$sql);
     $sql = "SELECT * FROM categories";
     $categories = mysqli_query($connect,$sql);
-    include_once "connect/closeConnect.php";
+    include "connect/closeConnect.php";
     $array = array();
     $array['book'] = $book;
     $array['categories'] = $categories;
@@ -40,14 +49,112 @@ function Product(){
 
 function detail() {
     $productid = $_GET['id'];
-    include_once "connect/openConnect.php";
+    include "connect/openConnect.php";
     $sqlBook = "SELECT book.*, author.name AS author_name
                 FROM book
                 LEFT JOIN author ON book.author_id = author.id
                 WHERE book.id = '$productid'";
     $book = mysqli_query($connect,$sqlBook);
-    include_once "connect/closeConnect.php";
+    include "connect/closeConnect.php";
     return $book;
+}
+
+function get_rating_summary($productId) {
+    $summary = array(
+        'average' => 0,
+        'count' => 0,
+        'breakdown' => array(5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0),
+    );
+    $productId = (int)$productId;
+    if ($productId <= 0) {
+        return $summary;
+    }
+    include "connect/openConnect.php";
+    $sql = "SELECT COUNT(*) AS total,
+                   COALESCE(AVG(rating), 0) AS average,
+                   SUM(rating = 5) AS five,
+                   SUM(rating = 4) AS four,
+                   SUM(rating = 3) AS three,
+                   SUM(rating = 2) AS two,
+                   SUM(rating = 1) AS one
+            FROM product_reviews
+            WHERE product_id = $productId AND status = 'approved'";
+    $result = mysqli_query($connect, $sql);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $summary['average'] = isset($row['average']) ? (float)$row['average'] : 0;
+        $summary['count'] = isset($row['total']) ? (int)$row['total'] : 0;
+        $summary['breakdown'] = array(
+            5 => isset($row['five']) ? (int)$row['five'] : 0,
+            4 => isset($row['four']) ? (int)$row['four'] : 0,
+            3 => isset($row['three']) ? (int)$row['three'] : 0,
+            2 => isset($row['two']) ? (int)$row['two'] : 0,
+            1 => isset($row['one']) ? (int)$row['one'] : 0,
+        );
+    }
+    include "connect/closeConnect.php";
+    return $summary;
+}
+
+function get_reviews($productId, $limit = 10) {
+    $reviews = array();
+    $productId = (int)$productId;
+    $limit = (int)$limit;
+    if ($productId <= 0) {
+        return $reviews;
+    }
+    if ($limit <= 0 || $limit > 100) {
+        $limit = 10;
+    }
+    include "connect/openConnect.php";
+    $sql = "SELECT review_name, rating, content, created_at, is_anonymous
+            FROM product_reviews
+            WHERE product_id = $productId AND status = 'approved'
+            ORDER BY created_at DESC
+            LIMIT $limit";
+    $result = mysqli_query($connect, $sql);
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $reviews[] = $row;
+        }
+    }
+    include "connect/closeConnect.php";
+    return $reviews;
+}
+
+function submit_review() {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        return;
+    }
+    if (!isset($_SESSION['customer_id'])) {
+        return;
+    }
+    $productId = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
+    $rating = isset($_POST['rating']) ? (int)$_POST['rating'] : 0;
+    $content = isset($_POST['review_content']) ? trim($_POST['review_content']) : '';
+    $reviewName = isset($_POST['review_name']) ? trim($_POST['review_name']) : '';
+    $isAnonymous = isset($_POST['is_anonymous']) ? 1 : 0;
+    if ($productId <= 0 || $rating < 1 || $rating > 5 || strlen($content) < 10) {
+        return;
+    }
+    if ($isAnonymous === 1) {
+        $reviewName = 'An danh';
+    } elseif ($reviewName === '') {
+        $reviewName = 'Khach';
+    }
+    $userIdValue = 'NULL';
+    if (isset($_SESSION['customer_id'])) {
+        $userIdValue = (int)$_SESSION['customer_id'];
+    }
+    $createdAt = date("Y-m-d H:i:s");
+    include "connect/openConnect.php";
+    $reviewNameEscaped = mysqli_real_escape_string($connect, $reviewName);
+    $contentEscaped = mysqli_real_escape_string($connect, $content);
+    $statusEscaped = mysqli_real_escape_string($connect, 'approved');
+    $sql = "INSERT INTO product_reviews (product_id, user_id, rating, review_name, content, is_anonymous, status, created_at)
+            VALUES ($productId, $userIdValue, $rating, '$reviewNameEscaped', '$contentEscaped', $isAnonymous, '$statusEscaped', '$createdAt')";
+    mysqli_query($connect, $sql);
+    include "connect/closeConnect.php";
 }
 function category() {
     $productid = $_GET['id'];
@@ -308,6 +415,9 @@ switch ($action){
         break;
     case 'detail':
         $book = detail();
+        $productId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        $ratingSummary = get_rating_summary($productId);
+        $reviews = get_reviews($productId, 20);
         break;
     case 'create';
          $array = create();
@@ -347,6 +457,9 @@ switch ($action){
         break;
     case 'payment_process':
         add_order();
+        break;
+    case 'submit_review':
+        submit_review();
         break;
 }
 

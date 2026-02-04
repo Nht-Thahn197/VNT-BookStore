@@ -163,12 +163,11 @@
                                     <span class="product__panel-price-current" >
                                         <?= $formattedNum = number_format($boo['price'], 0, ',', '.');?>₫
                                     </span>
+                                    <?php $ratingAverage = isset($boo['rating_average']) ? (float)$boo['rating_average'] : 0; ?>
                                     <div class="product__panel-rate-wrap">
-                                        <i class="fas fa-star product__panel-rate"></i>
-                                        <i class="fas fa-star product__panel-rate"></i>
-                                        <i class="fas fa-star product__panel-rate"></i>
-                                        <i class="fas fa-star product__panel-rate"></i>
-                                        <i class="fas fa-star product__panel-rate"></i>
+                                        <?php for ($i = 1; $i <= 5; $i++) { ?>
+                                            <i class="<?= ($ratingAverage >= $i) ? 'fas' : 'far' ?> fa-star product__panel-rate"></i>
+                                        <?php } ?>
                                     </div>
                                 </div>
                                 <a href="index.php?controller=home&action=detail&id=<?=$boo['id'] ?>" class="product__panel-cta">Mua ngay</a>

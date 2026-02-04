@@ -13,7 +13,16 @@ function category() {
     include_once "connect/openConnect.php";
     $sqlCategory = "SELECT * FROM categories WHERE id = '$categoryid'";
     $category = mysqli_query($connect,$sqlCategory);
-    $sql = "SELECT * FROM book WHERE category_id = '$categoryid'";
+    $sql = "SELECT book.*,
+                   COALESCE(r.avg_rating, 0) AS rating_average
+            FROM book
+            LEFT JOIN (
+                SELECT product_id, AVG(rating) AS avg_rating
+                FROM product_reviews
+                WHERE status = 'approved'
+                GROUP BY product_id
+            ) r ON r.product_id = book.id
+            WHERE book.category_id = '$categoryid'";
     $book = mysqli_query($connect,$sql);
     include_once "connect/closeConnect.php";
     $array = array();

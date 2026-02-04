@@ -10,10 +10,10 @@
             <a class="navbar-brand" href="index.php?controller=admin"><span>Book</span>Store</a>
             <ul class="user-menu">
                 <li class="dropdown pull-right">
-                    <a href="index.php?controller=admin" class="dropdown-toggle" data-toggle="dropdown"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> Admin <span class="caret"></span></a>
+                    <a href="index.php?controller=admin" class="dropdown-toggle" data-toggle="dropdown"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> <?= isset($_SESSION['admin_name']) && $_SESSION['admin_name'] !== '' ? htmlspecialchars($_SESSION['admin_name'], ENT_QUOTES) : 'Admin' ?> <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
-                        <li><a href="#"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> Hồ sơ</a></li>
-                        <li><a href="#"><svg class="glyph stroked cancel"><use xlink:href="#stroked-cancel"></use></svg> Đăng xuất</a></li>
+                        <li><a href="index.php?controller=admin&action=profile"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> Hồ sơ</a></li>
+                        <li><a href="index.php?controller=admin&action=logout"><svg class="glyph stroked cancel"><use xlink:href="#stroked-cancel"></use></svg> Đăng xuất</a></li>
                     </ul>
                 </li>
             </ul>

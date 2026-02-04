@@ -518,6 +518,8 @@ a.bg-danger:hover {
 }
 
 .user-menu a {
+	display: flex;
+	align-items: center;
 	color: #fff;
 }
 

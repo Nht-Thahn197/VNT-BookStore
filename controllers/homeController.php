@@ -51,6 +51,16 @@ switch ($action){
         include_once "models/productModels.php";
         include_once "view/home/success.php";
         break;
+    case 'submit_review':
+        if (!isset($_SESSION['customer_id'])) {
+            header('location:index.php?controller=customer&action=login');
+            exit;
+        }
+        include_once "models/productModels.php";
+        $productId = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
+        header('location:index.php?controller=home&action=detail&id=' . $productId);
+        exit;
+        break;
 }
 
 ?>

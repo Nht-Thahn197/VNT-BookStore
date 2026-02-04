@@ -6,14 +6,14 @@
     <title>Liên hệ</title>
 
     <link rel="icon" type="image/png" href="view/home/images/favicon_home.ico">
-    <script src="js/jquery-3.3.1.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="view/home/js/jquery-3.3.1.js"></script>
+    <script src="view/home/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="view/home/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="fonts/fontawesome/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="view/home/fonts/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="view/home/css/style.css">
+    <link rel="stylesheet" href="view/home/css/contact.css">
 </head>
 <body>
     <!-- header -->
@@ -107,6 +107,6 @@
     <!-- footer -->
     <?php include_once 'view/home/partials/footer.php'; ?>
     <!-- end footer -->
-    <script src="js/jq.js"></script>
+    <script src="view/home/js/jq.js"></script>
 </body>
 </html>
